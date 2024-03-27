@@ -2,12 +2,11 @@ spring:
   application:
     name: invstore-jvm
   datasource:
-    url: jdbc:mysql://localhost:3306/invstore?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/invstore?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: root
-    password: root
+    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
     properties:
@@ -20,8 +19,8 @@ spring:
       client:
         registration:
           github:
-            client-id: 8b48f13c7553a3204524
-            client-secret: d132cccdfbe7d5ad365de1adae9838912d1fea63
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
 
 logging:
   level:
@@ -37,5 +36,5 @@ springdoc:
 # App Properties
 invstore:
   app:
-    jwtSecret: ======================BezKoder=Spring===========================
+    jwtSecret: ${JWT_SECRET}
     jwtExpirationMs: 86400000

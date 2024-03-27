@@ -55,8 +55,6 @@ export default {
       }
     axios.post(Helpers.paths.register(), state.user)
       .then((res) => {
-        localStorage.setItem('logged_in', true);
-        commit(StoreMutations.SET_LOGGED_IN, true);
         commit(StoreMutations.SET_MESSAGE, res.data.message);
         commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
         commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
@@ -77,29 +75,34 @@ export default {
       });
   },
   check_login(state) {
-    return axios.get(Helpers.paths.checkLogin())
-      .then((res) => {
-        state.commit(StoreMutations.SET_LOGGED_IN, true);
-        state.commit(StoreMutations.SET_MESSAGE, res.data.message);
-        state.commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
-        state.commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
-        state.commit(StoreMutations.SET_MESSAGE_TYPE, MessageTypes.success);
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          // Unauthorized error
-          localStorage.removeItem('jwt');
-          state.commit(StoreMutations.SET_LOGGED_IN, false);
-        } else if (error.response && error.response.status === 404) {
-          state.commit(StoreMutations.SET_MESSAGE, 'User not found');
-          state.commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
-          state.commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
-          state.commit(StoreMutations.SET_MESSAGE_TYPE, MessageTypes.warning);
-        } else {
-          // Other errors
-          console.error(error);
-        }
-      });
+      const getToken = () => {
+        return localStorage.getItem('jwt');
+      };
+      if (getToken()) {
+          return axios.get(Helpers.paths.checkLogin())
+              .then((res) => {
+                  state.commit(StoreMutations.SET_LOGGED_IN, true);
+                  state.commit(StoreMutations.SET_MESSAGE, res.data.message);
+                  state.commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
+                  state.commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
+                  state.commit(StoreMutations.SET_MESSAGE_TYPE, MessageTypes.success);
+              })
+              .catch((error) => {
+                  if (error.response && error.response.status === 401) {
+                      // Unauthorized error
+                      localStorage.removeItem('jwt');
+                      state.commit(StoreMutations.SET_LOGGED_IN, false);
+                  } else if (error.response && error.response.status === 404) {
+                      state.commit(StoreMutations.SET_MESSAGE, 'User not found');
+                      state.commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
+                      state.commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
+                      state.commit(StoreMutations.SET_MESSAGE_TYPE, MessageTypes.warning);
+                  } else {
+                      // Other errors
+                      console.error(error);
+                  }
+              });
+      }
   },
   logout(state) {
     return axios.post(Helpers.paths.logout())

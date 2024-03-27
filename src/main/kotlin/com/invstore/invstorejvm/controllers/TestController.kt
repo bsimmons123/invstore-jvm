@@ -19,19 +19,4 @@ class TestController {
     fun test(): ResponseEntity.BodyBuilder {
         return ResponseEntity.ok()
     }
-
-    @Bean
-    fun simpleCorsFilter(): FilterRegistrationBean<*> {
-        val source = UrlBasedCorsConfigurationSource()
-        val config = CorsConfiguration()
-        config.allowCredentials = false
-        // *** URL below needs to match the Vue client URL and port ***
-        config.allowedOrigins = Collections.singletonList("*")
-        config.allowedMethods = Collections.singletonList("*")
-        config.allowedHeaders = Collections.singletonList("*")
-        source.registerCorsConfiguration("/**", config)
-        val bean = FilterRegistrationBean<Filter>(CorsFilter(source))
-        bean.order = Ordered.HIGHEST_PRECEDENCE
-        return bean
-    }
 }

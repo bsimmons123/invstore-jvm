@@ -5,9 +5,12 @@ import com.invstore.invstorejvm.security.jwt.AuthEntryPointJwt
 import com.invstore.invstorejvm.security.jwt.AuthTokenFilter
 import com.invstore.invstorejvm.security.services.CustomOAuth2UserService
 import com.invstore.invstorejvm.security.services.UserDetailsServiceImpl
+import jakarta.servlet.Filter
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.Ordered
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -28,6 +31,10 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.web.filter.CorsFilter
+import java.util.*
 
 @Configuration
 @EnableMethodSecurity
@@ -71,10 +78,20 @@ class WebSecurityConfig {
         return CustomOAuth2UserService(userRepository)
     }
 
-//    @Bean
-//    fun csrfTokenRepository(): CsrfTokenRepository {
-//        return HttpSessionCsrfTokenRepository()
-//    }
+    @Bean
+    fun simpleCorsFilter(): FilterRegistrationBean<*> {
+        val source = UrlBasedCorsConfigurationSource()
+        val config = CorsConfiguration()
+        config.allowCredentials = false
+        // *** URL below needs to match the Vue client URL and port ***
+        config.allowedOrigins = Collections.singletonList("*")
+        config.allowedMethods = Collections.singletonList("*")
+        config.allowedHeaders = Collections.singletonList("*")
+        source.registerCorsConfiguration("/**", config)
+        val bean = FilterRegistrationBean<Filter>(CorsFilter(source))
+        bean.order = Ordered.HIGHEST_PRECEDENCE
+        return bean
+    }
 
     @Bean
     @Throws(Exception::class)
