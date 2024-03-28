@@ -14,9 +14,7 @@ import java.security.Principal
 @RestController
 @RequestMapping("/api/v1/user")
 @Tag(description = "API endpoint for checking user session", name = "User")
-class UserController(
-    private val jwtUtils: JwtUtils
-) {
+class UserController {
 
     @GetMapping("/")
     fun checkUserSession(principal: Principal?): ResponseEntity<Any> {
@@ -26,8 +24,6 @@ class UserController(
             return ResponseEntity.status(401).build()
         }
 
-        val jwt = jwtUtils.generateJwtToken(auth)
-
-        return ResponseEntity.ok().body(jwt)
+        return ResponseEntity.ok().body("NU UH")
     }
 }

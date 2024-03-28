@@ -6,6 +6,7 @@ import com.invstore.invstorejvm.security.jwt.AuthTokenFilter
 import com.invstore.invstorejvm.security.services.CustomOAuth2UserService
 import com.invstore.invstorejvm.security.services.OAuth2AuthenticationSuccessHandler
 import com.invstore.invstorejvm.security.services.UserDetailsServiceImpl
+import com.invstore.invstorejvm.services.user.UserService
 import jakarta.servlet.Filter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.servlet.FilterRegistrationBean
@@ -47,7 +48,7 @@ class WebSecurityConfig {
     private val unauthorizedHandler: AuthEntryPointJwt? = null
 
     @Autowired
-    private val userRepository: UserRepository? = null
+    private val userService: UserService? = null
 
     @Autowired
     private val authenticationSuccessHandler: OAuth2AuthenticationSuccessHandler? = null
@@ -78,8 +79,8 @@ class WebSecurityConfig {
     }
 
     @Bean
-    fun oauthUserService(userRepository: UserRepository, userDetailsServiceImpl: UserDetailsServiceImpl): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-        return CustomOAuth2UserService(userRepository)
+    fun oauthUserService(userService: UserService, userDetailsServiceImpl: UserDetailsServiceImpl): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+        return CustomOAuth2UserService(userService)
     }
 
     @Bean
@@ -112,7 +113,7 @@ class WebSecurityConfig {
                 auth.requestMatchers("/api/v1/auth/**", "/api/v1/auth/session/oauth/callback/").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                     .requestMatchers("/", "/static/**", "/favicon.png", "/index.html").permitAll()
-                    .requestMatchers("/oauth2/authorization/github", "/login/oauth2/code/github").permitAll()
+                    .requestMatchers("/login/oauth2/code/google", "/login/oauth2/code/github").permitAll()
                     .anyRequest().authenticated()
             }
             .csrf{c -> c
@@ -126,7 +127,7 @@ class WebSecurityConfig {
                 oauth.defaultSuccessUrl("/api/v1/auth/session/oauth/callback").permitAll()
                 oauth.failureUrl("/#/signup?checklogin=true").permitAll()
                 oauth.userInfoEndpoint {
-                    it.userService(oauthUserService(userRepository!!, userDetailsService!!))
+                    it.userService(oauthUserService(userService!!, userDetailsService!!))
                 }
                 oauth.successHandler(authenticationSuccessHandler)
             } // OpenID Connect with GitHub

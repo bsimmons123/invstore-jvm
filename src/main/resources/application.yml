@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/invstore?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: root
-    password: password
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -21,7 +21,11 @@ spring:
           github:
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_CLIENT_SECRET}
-
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+  profiles:
+    active: prod
 logging:
   level:
     org:
@@ -38,3 +42,5 @@ invstore:
   app:
     jwtSecret: ${JWT_SECRET}
     jwtExpirationMs: 86400000
+server:
+  port: 9090

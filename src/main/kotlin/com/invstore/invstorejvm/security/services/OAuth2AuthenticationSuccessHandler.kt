@@ -14,7 +14,6 @@ class OAuth2AuthenticationSuccessHandler() : AuthenticationSuccessHandler {
         response: HttpServletResponse,
         authentication: Authentication
     ) {
-
         // Prepare your successful authentication payload
         request.session.setAttribute("auth", authentication)
 

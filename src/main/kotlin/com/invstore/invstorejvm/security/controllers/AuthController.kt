@@ -1,6 +1,7 @@
 package com.invstore.invstorejvm.security.controllers
 
 import com.invstore.invstorejvm.models.users.User
+import com.invstore.invstorejvm.security.jwt.JwtOperations
 import com.invstore.invstorejvm.security.jwt.JwtUtils
 import com.invstore.invstorejvm.security.requests.AuthRequests
 import com.invstore.invstorejvm.security.requests.JwtResponse
@@ -9,6 +10,7 @@ import com.invstore.invstorejvm.security.services.UserDetailsImpl
 import com.invstore.invstorejvm.services.user.UserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -16,7 +18,9 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.util.StringUtils
 import org.springframework.web.bind.annotation.*
+import java.security.Principal
 
 @RestController
 @CrossOrigin(origins = ["http://localhost:8082"])
@@ -25,7 +29,7 @@ class AuthController(
     private val userService: UserService,
     private val passwordEncoder: PasswordEncoder,
     private val authenticationManager: AuthenticationManager,
-    private val jwtUtils: JwtUtils
+    private var jwtUtils: JwtOperations
 ) {
 
     @PostMapping("/signup")
@@ -80,10 +84,34 @@ class AuthController(
     }
 
     @GetMapping("/session/oauth/callback")
-    fun getLoggedInUser(request: HttpServletRequest): ResponseEntity<Any> {
-        val auth = request.session.getAttribute("auth") as Authentication
-        SecurityContextHolder.getContext().authentication = auth
-        val jwt = jwtUtils.generateJwtTokenOauth(auth)
-        return ResponseEntity.ok(jwt)
+    fun getLoggedInUser(request: HttpServletRequest, principal: Principal?): ResponseEntity<Any> {
+        try {
+            val oldJwt = parseJwt(request)
+            val isValid = jwtUtils.validateJwtToken(oldJwt)
+            if (oldJwt == null || !isValid) {
+                val auth = request.session.getAttribute("auth") as Authentication
+                SecurityContextHolder.getContext().authentication = auth
+                val jwt = jwtUtils.generateJwtTokenOauth(auth)
+                return ResponseEntity.ok(jwt)
+            }
+            return ResponseEntity.ok(oldJwt)
+        } catch (_: Exception) {
+            return ResponseEntity.badRequest().body("Error: JWT is invalid, or user is not authenticated")
+        }
+    }
+
+    private fun parseJwt(request: HttpServletRequest): String? {
+        try {
+            val headerAuth = request.getHeader("Authorization")
+
+            if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+                return headerAuth.substring(7)
+            }
+
+        } catch (e: Exception) {
+            throw e
+        }
+
+        return null
     }
 }

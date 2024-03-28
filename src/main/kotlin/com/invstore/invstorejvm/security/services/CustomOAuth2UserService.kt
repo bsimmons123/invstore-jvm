@@ -3,6 +3,7 @@ package com.invstore.invstorejvm.security.services
 import com.invstore.invstorejvm.models.users.User
 import com.invstore.invstorejvm.repositories.users.UserRepository
 import com.invstore.invstorejvm.security.jwt.JwtUtils
+import com.invstore.invstorejvm.services.user.UserService
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
@@ -14,10 +15,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
+import java.time.LocalDateTime
 import java.util.Collections.singletonList
 
 class CustomOAuth2UserService(
-    private val userRepository: UserRepository
+    private val userService: UserService
     ) : DefaultOAuth2UserService() {
 
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
@@ -29,7 +31,7 @@ class CustomOAuth2UserService(
         val provider: String = userRequest.clientRegistration.registrationId
         val providerId: Int = oAuth2User.attributes["id"] as Int? ?: 0
 
-        val user = userRepository.findByEmailOrUsername(email, username) ?:
+        val user = userService.findByEmailOrUsername(email, username) ?:
             User(
                 email = email,
                 name = name,
@@ -38,7 +40,10 @@ class CustomOAuth2UserService(
                 providerId = providerId.toString()
             )
 
-        userRepository.save(user) // Save/update user in DB
+        // update the last logged in attrib
+        user.lastLoggedIn = LocalDateTime.now()
+
+        userService.save(user) // Save/update user in DB
 
         return DefaultOAuth2User(
             singletonList(SimpleGrantedAuthority("ROLE_USER")),

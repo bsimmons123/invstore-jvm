@@ -3,6 +3,7 @@ package com.invstore.invstorejvm.services.user
 import com.invstore.invstorejvm.models.users.User
 import com.invstore.invstorejvm.repositories.users.UserRepository
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class UserService(private var repository: UserRepository) : IUserService {
@@ -20,6 +21,9 @@ class UserService(private var repository: UserRepository) : IUserService {
     }
 
     override fun save(user: User): User? {
+        // Update the updated at value
+        user.updatedAt = LocalDateTime.now()
+
         return repository.save(user)
     }
 

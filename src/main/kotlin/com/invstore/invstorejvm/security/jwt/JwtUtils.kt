@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.stereotype.Component
@@ -14,14 +15,15 @@ import java.security.Key
 import java.util.*
 
 @Component
-class JwtUtils {
+@Profile("prod")
+class JwtUtils : JwtOperations {
   @Value("\${invstore.app.jwtSecret}")
   private val jwtSecret: String? = null
 
   @Value("\${invstore.app.jwtExpirationMs}")
   private val jwtExpirationMs = 0
 
-  fun generateJwtToken(authentication: Authentication): String {
+  override fun generateJwtToken(authentication: Authentication): String {
     val userPrincipal = authentication.principal as UserDetailsImpl
 
     return Jwts.builder()
@@ -32,7 +34,7 @@ class JwtUtils {
       .compact()
   }
 
-  fun generateJwtTokenOauth(authentication: Authentication): String {
+  override fun generateJwtTokenOauth(authentication: Authentication): String {
     val userPrincipal = authentication.principal as DefaultOAuth2User
 
     return Jwts.builder()
@@ -47,12 +49,12 @@ class JwtUtils {
     return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret))
   }
 
-  fun getUserNameFromJwtToken(token: String?): String {
+  override fun getUserNameFromJwtToken(token: String?): String {
     return Jwts.parserBuilder().setSigningKey(key()).build()
       .parseClaimsJws(token).body.subject
   }
 
-  fun validateJwtToken(authToken: String?): Boolean {
+  override fun validateJwtToken(authToken: String?): Boolean {
     try {
       Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken)
       return true
