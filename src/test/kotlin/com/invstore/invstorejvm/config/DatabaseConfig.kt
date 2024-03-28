@@ -1,4 +1,4 @@
-package com.invstore.invstorejvm
+package com.invstore.invstorejvm.config
 
 import com.zaxxer.hikari.HikariDataSource
 import jakarta.persistence.EntityManagerFactory
@@ -13,13 +13,11 @@ import org.springframework.orm.jpa.JpaVendorAdapter
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.orm.jpa.vendor.Database
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
-import org.springframework.test.context.TestPropertySource
-import java.util.function.Supplier
 import javax.sql.DataSource
 
 
 @Configuration
-@Profile("Test")
+@Profile("test")
 class DatabaseConfig {
     var logger: Logger = LoggerFactory.getLogger(DatabaseConfig::class.java)
 
