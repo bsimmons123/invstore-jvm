@@ -14,6 +14,7 @@ import java.io.IOException
 
 @Component
 class AuthEntryPointJwt : AuthenticationEntryPoint {
+
   @Throws(IOException::class, ServletException::class)
   override fun commence(
     request: HttpServletRequest,

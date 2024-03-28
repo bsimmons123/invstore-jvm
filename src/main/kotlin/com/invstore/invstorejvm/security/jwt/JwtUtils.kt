@@ -8,6 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.stereotype.Component
 import java.security.Key
 import java.util.*
@@ -25,6 +26,17 @@ class JwtUtils {
 
     return Jwts.builder()
       .setSubject((userPrincipal.username))
+      .setIssuedAt(Date())
+      .setExpiration(Date(Date().time + jwtExpirationMs))
+      .signWith(key(), SignatureAlgorithm.HS256)
+      .compact()
+  }
+
+  fun generateJwtTokenOauth(authentication: Authentication): String {
+    val userPrincipal = authentication.principal as DefaultOAuth2User
+
+    return Jwts.builder()
+      .setSubject((userPrincipal.name))
       .setIssuedAt(Date())
       .setExpiration(Date(Date().time + jwtExpirationMs))
       .signWith(key(), SignatureAlgorithm.HS256)

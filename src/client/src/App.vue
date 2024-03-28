@@ -13,14 +13,12 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
 <script setup>
-import {computed, onMounted} from "vue";
+import {computed} from "vue";
 import { useStore } from "vuex";
 import Sidenav from "./examples/Sidenav";
 import Configurator from "@/examples/Configurator.vue";
 import Navbar from "@/examples/Navbars/Navbar.vue";
 import AppFooter from "@/examples/Footer.vue";
-import {StoreActions} from "@/store/login/actions";
-import StoreIndex from "@/store/login/_StoreIndex";
 
 const store = useStore();
 
@@ -37,7 +35,6 @@ const showConfig = computed(() => argonState.showConfig);
 const hideConfigButton = computed(() => argonState.hideConfigButton);
 
 const toggleConfigurator = () => store.commit("argon/toggleConfigurator");
-const fetchUserData = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.check_login}`)
 
 const navClasses = computed(() => {
   return {
@@ -48,9 +45,6 @@ const navClasses = computed(() => {
     "position-absolute px-4 mx-0 w-100 z-index-2": isAbsolute.value,
     "px-0 mx-4": !isAbsolute.value,
   };
-});
-onMounted(async () => {
-  await fetchUserData()
 });
 </script>
 <template>

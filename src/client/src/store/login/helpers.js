@@ -4,7 +4,7 @@ export default class Helpers {
     loginPath: '/v1/auth/signin',
     logoutPath: '/v1/auth/logout',
     registerPath: '/v1/auth/signup',
-    checkLoginPath: '/v1/user/',
+    checkLoginPath: '/v1/auth/session/oauth/callback',
     login() {
       return this.root + this.loginPath;
     },

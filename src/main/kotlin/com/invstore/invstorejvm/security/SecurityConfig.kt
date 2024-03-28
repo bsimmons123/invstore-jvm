@@ -4,6 +4,7 @@ import com.invstore.invstorejvm.repositories.users.UserRepository
 import com.invstore.invstorejvm.security.jwt.AuthEntryPointJwt
 import com.invstore.invstorejvm.security.jwt.AuthTokenFilter
 import com.invstore.invstorejvm.security.services.CustomOAuth2UserService
+import com.invstore.invstorejvm.security.services.OAuth2AuthenticationSuccessHandler
 import com.invstore.invstorejvm.security.services.UserDetailsServiceImpl
 import jakarta.servlet.Filter
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,6 +49,9 @@ class WebSecurityConfig {
     @Autowired
     private val userRepository: UserRepository? = null
 
+    @Autowired
+    private val authenticationSuccessHandler: OAuth2AuthenticationSuccessHandler? = null
+
     @Bean
     fun authenticationJwtTokenFilter(): AuthTokenFilter {
         return AuthTokenFilter()
@@ -74,7 +78,7 @@ class WebSecurityConfig {
     }
 
     @Bean
-    fun oauthUserService(userRepository: UserRepository): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+    fun oauthUserService(userRepository: UserRepository, userDetailsServiceImpl: UserDetailsServiceImpl): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
         return CustomOAuth2UserService(userRepository)
     }
 
@@ -105,7 +109,7 @@ class WebSecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers("/api/v1/auth/**").permitAll()
+                auth.requestMatchers("/api/v1/auth/**", "/api/v1/auth/session/oauth/callback/").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                     .requestMatchers("/", "/static/**", "/favicon.png", "/index.html").permitAll()
                     .requestMatchers("/oauth2/authorization/github", "/login/oauth2/code/github").permitAll()
@@ -118,12 +122,13 @@ class WebSecurityConfig {
 //                .csrfTokenRepository(csrfTokenRepository())
             }
             .oauth2Login { oauth: OAuth2LoginConfigurer<HttpSecurity?> ->
-                oauth.loginPage("/#/signin").permitAll()
-                oauth.defaultSuccessUrl("/#/dashboard")
-                oauth.failureUrl("/#/signin").permitAll()
+                oauth.loginPage("/#/signin?checkLogin=true").permitAll()
+                oauth.defaultSuccessUrl("/api/v1/auth/session/oauth/callback").permitAll()
+                oauth.failureUrl("/#/signup?checklogin=true").permitAll()
                 oauth.userInfoEndpoint {
-                    it.userService(oauthUserService(userRepository!!))
+                    it.userService(oauthUserService(userRepository!!, userDetailsService!!))
                 }
+                oauth.successHandler(authenticationSuccessHandler)
             } // OpenID Connect with GitHub
 
 

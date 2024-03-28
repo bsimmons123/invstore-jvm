@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeUnmount, onBeforeMount, computed} from "vue";
+import {onBeforeUnmount, onBeforeMount, computed, onMounted} from "vue";
 import { useStore } from "vuex";
 import Navbar from "@/examples/PageLayout/Navbar.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
@@ -8,9 +8,11 @@ import ArgonButton from "@/components/ArgonButton.vue";
 import StoreIndex from "@/store/login/_StoreIndex";
 import {StoreActions} from "@/store/login/actions";
 import ArgonAlert from "@/components/ArgonAlert.vue";
+import {useRoute} from "vue-router";
 const body = document.getElementsByTagName("body")[0];
 
 const store = useStore();
+const route = useRoute()
 
 const argonState = store.state.argon;
 const loginState = store.state.userLogin;
@@ -26,6 +28,7 @@ const passwordUpdate = (payload) => store.commit("userLogin/SET_PASSWORD", paylo
 const showError = (payload) => store.commit("userLogin/TOGGLE_SHOW_MESSAGE", payload);
 
 const login = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.login}`);
+const checkLogin = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.check_login}`);
 
 onBeforeMount(() => {
   argonState.hideConfigButton = true;
@@ -44,6 +47,11 @@ onBeforeUnmount(() => {
   showError(false);
   body.classList.add("bg-gray-100");
 });
+onMounted(() => {
+  if (route.query.checklogin) {
+    checkLogin()
+  }
+})
 </script>
 <template>
   <div class="container top-0 position-sticky z-index-sticky">

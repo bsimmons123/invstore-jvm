@@ -23,29 +23,29 @@ class Role(@Column(nullable = false, unique = true) var name: String?) {
         return result
     }
 
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
             return true
         }
-        if (obj == null) {
+        if (other == null) {
             return false
         }
-        if (javaClass != obj.javaClass) {
+        if (javaClass != other.javaClass) {
             return false
         }
-        val other = obj as Role
+        val other1 = other as Role
         if (id == null) {
-            if (other.id != null) {
+            if (other1.id != null) {
                 return false
             }
-        } else if (id != other.id) {
+        } else if (id != other1.id) {
             return false
         }
         if (name == null) {
-            if (other.name != null) {
+            if (other1.name != null) {
                 return false
             }
-        } else if (name != other.name) {
+        } else if (name != other1.name) {
             return false
         }
         return true
