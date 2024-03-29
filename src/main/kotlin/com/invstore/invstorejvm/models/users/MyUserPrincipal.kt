@@ -11,7 +11,7 @@ class MyUserPrincipal(val user: User) : UserDetails {
     }
 
     override fun getPassword(): String {
-        return user.password
+        return user.password ?: ""
     }
 
     override fun getAuthorities(): Collection<GrantedAuthority> {

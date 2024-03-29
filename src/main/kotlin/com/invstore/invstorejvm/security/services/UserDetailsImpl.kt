@@ -12,7 +12,7 @@ class UserDetailsImpl(
   val id: Long,
   private val username: String,
   val email: String,
-  @field:JsonIgnore private val password: String,
+  @field:JsonIgnore private val password: String?,
   private val authorities: Collection<GrantedAuthority>
 ) : UserDetails {
   override fun getAuthorities(): Collection<GrantedAuthority> {
@@ -20,7 +20,7 @@ class UserDetailsImpl(
   }
 
   override fun getPassword(): String {
-    return password
+    return password ?: ""
   }
 
   override fun getUsername(): String {

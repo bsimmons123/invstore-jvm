@@ -1,12 +1,11 @@
 package com.invstore.invstorejvm.security
 
-import com.invstore.invstorejvm.repositories.users.UserRepository
 import com.invstore.invstorejvm.security.jwt.AuthEntryPointJwt
 import com.invstore.invstorejvm.security.jwt.AuthTokenFilter
 import com.invstore.invstorejvm.security.services.CustomOAuth2UserService
 import com.invstore.invstorejvm.security.services.OAuth2AuthenticationSuccessHandler
 import com.invstore.invstorejvm.security.services.UserDetailsServiceImpl
-import com.invstore.invstorejvm.services.user.UserService
+import com.invstore.invstorejvm.services.user.IUserService
 import jakarta.servlet.Filter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.servlet.FilterRegistrationBean
@@ -28,11 +27,6 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository
-import org.springframework.security.web.csrf.CsrfTokenRepository
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
@@ -48,7 +42,7 @@ class WebSecurityConfig {
     private val unauthorizedHandler: AuthEntryPointJwt? = null
 
     @Autowired
-    private val userService: UserService? = null
+    private val userService: IUserService? = null
 
     @Autowired
     private val authenticationSuccessHandler: OAuth2AuthenticationSuccessHandler? = null
@@ -79,7 +73,7 @@ class WebSecurityConfig {
     }
 
     @Bean
-    fun oauthUserService(userService: UserService, userDetailsServiceImpl: UserDetailsServiceImpl): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+    fun oauthUserService(userService: IUserService, userDetailsServiceImpl: UserDetailsServiceImpl): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
         return CustomOAuth2UserService(userService)
     }
 

@@ -1,25 +1,17 @@
 package com.invstore.invstorejvm.security.services
 
 import com.invstore.invstorejvm.models.users.User
-import com.invstore.invstorejvm.repositories.users.UserRepository
-import com.invstore.invstorejvm.security.jwt.JwtUtils
-import com.invstore.invstorejvm.services.user.UserService
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import com.invstore.invstorejvm.services.user.IUserService
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
-import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.web.context.request.ServletRequestAttributes
 import java.time.LocalDateTime
 import java.util.Collections.singletonList
 
 class CustomOAuth2UserService(
-    private val userService: UserService
+    private val userService: IUserService
     ) : DefaultOAuth2UserService() {
 
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
@@ -37,13 +29,14 @@ class CustomOAuth2UserService(
                 name = name,
                 username = username,
                 provider = provider,
-                providerId = providerId.toString()
+                providerId = providerId.toString(),
+                isActive = true
             )
 
         // update the last logged in attrib
         user.lastLoggedIn = LocalDateTime.now()
 
-        userService.save(user) // Save/update user in DB
+        userService.create(user) // Save/update user in DB
 
         return DefaultOAuth2User(
             singletonList(SimpleGrantedAuthority("ROLE_USER")),

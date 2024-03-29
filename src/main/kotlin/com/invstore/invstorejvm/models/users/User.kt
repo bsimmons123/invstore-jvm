@@ -12,16 +12,16 @@ data class User(
     val id: Long = 0,
 
     @Column(nullable = false, length = 100)
-    var username: String = "",
+    var username: String,
 
     @Column(nullable = false, length = 50)
-    var name: String = "",
+    var name: String,
 
-    @Column(nullable = false, length = 2000)
-    var password: String = "",
+    @Column(length = 2000)
+    var password: String? = null,
 
     @Column(unique = true, nullable = false, length = 120)
-    var email: String = "",
+    var email: String,
 
     var provider: String? = null,
 
@@ -45,7 +45,7 @@ data class User(
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "is_active")
-    var isActive: Boolean = true,
+    var isActive: Boolean,
 
     @Column(length = 50)
     var timezone: String = "UTC"

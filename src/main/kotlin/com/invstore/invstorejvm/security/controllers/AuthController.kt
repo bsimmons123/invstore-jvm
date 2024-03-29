@@ -2,25 +2,24 @@ package com.invstore.invstorejvm.security.controllers
 
 import com.invstore.invstorejvm.models.users.User
 import com.invstore.invstorejvm.security.jwt.JwtOperations
-import com.invstore.invstorejvm.security.jwt.JwtUtils
 import com.invstore.invstorejvm.security.requests.AuthRequests
 import com.invstore.invstorejvm.security.requests.JwtResponse
 import com.invstore.invstorejvm.security.requests.SignInRequest
 import com.invstore.invstorejvm.security.services.UserDetailsImpl
+import com.invstore.invstorejvm.services.user.IUserService
 import com.invstore.invstorejvm.services.user.UserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.util.StringUtils
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
+import java.time.LocalDateTime
 
 @RestController
 @CrossOrigin(origins = ["http://localhost:8082"])
@@ -42,14 +41,15 @@ class AuthController(
         }
 
         // Create new user's account
-        val user = User()
+        val user = User(
+            email = newUser.email,
+            username = newUser.username,
+            isActive = true,
+            name = newUser.username,
+            password = passwordEncoder.encode(newUser.password)
+        )
 
-        user.username = newUser.username
-        user.email = newUser.email
-
-        user.password = passwordEncoder.encode(newUser.password)
-
-        val savedUser = userService.save(user)
+        val savedUser = userService.create(user)
 
         return ResponseEntity.ok(savedUser!!.id)
     }
@@ -67,6 +67,11 @@ class AuthController(
 
         // The authenticated user
         val userDetails = authentication.principal as UserDetailsImpl
+        val user  = userService.findByEmailOrUsername(loginRequest.email, loginRequest.email)
+        if (user != null) {
+            user.lastLoggedIn = LocalDateTime.now()
+            userService.update(user)
+        }
 
         return ResponseEntity.ok(
             JwtResponse(

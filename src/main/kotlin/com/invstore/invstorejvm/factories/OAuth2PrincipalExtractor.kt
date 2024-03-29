@@ -1,7 +1,7 @@
 package com.invstore.invstorejvm.factories
 
 import com.invstore.invstorejvm.models.users.User
-import com.invstore.invstorejvm.repositories.users.UserRepository
+import com.invstore.invstorejvm.services.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class OAuth2PrincipalExtractor(
-    @Autowired private val userRepository: UserRepository
+    @Autowired private val userService: UserService
 ) : DefaultOAuth2UserService() {
 
 
@@ -22,14 +22,18 @@ class OAuth2PrincipalExtractor(
 
         val id = attributes["id"] as String? // Adjust this to the actual attribute name
         if (id != null) {
-            val existingUser: User? = userRepository.findByProviderId(id)
+            val existingUser: User? = userService.findByProviderId(id)
 
             if (existingUser == null) {
-                val newUser = User()
-                newUser.providerId = id
-                newUser.email = (attributes["email"] as String?).toString() // Adjust this to the actual attribute name
+                val newUser = User(
+                    providerId = id,
+                    email = (attributes["email"] as String?).toString(),
+                    isActive = true,
+                    name = (attributes["name"] as String?).toString(),
+                    username = (attributes["username"] as String?).toString()
+                )
                 // add any additional necessary mapping.
-                userRepository.save(newUser)
+                userService.create(newUser)
             }}
 
         return user
