@@ -34,7 +34,7 @@ onMounted(() => {
       <div class="col-12">
         <catering-list-table
             :list="list"
-            :title="`${user.name}'s Catering Lists`"
+            :title="`${user.username}'s Catering Lists`"
             :loading="loadingLists"
         />
       </div>

@@ -1,5 +1,5 @@
 package com.invstore.invstorejvm.repositories.users
-import com.fasterxml.jackson.databind.util.ArrayBuilders.BooleanBuilder
+
 import com.invstore.invstorejvm.models.users.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository

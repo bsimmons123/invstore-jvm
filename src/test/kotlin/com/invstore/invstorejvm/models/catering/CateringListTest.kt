@@ -71,8 +71,8 @@ class CateringListTest {
 
         val user = findPersistedUser()
 
-        val foundUser = cateringListService.findByUserId(user!!.id)
-        assert(foundUser!!.id > 0)
+        val cateringLists = cateringListService.findByUserId(user!!.id)
+        assert(cateringLists!!.isNotEmpty())
         assert(cateringList.id.toInt() > 0)
     }
 
