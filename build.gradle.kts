@@ -5,7 +5,6 @@ plugins {
     id("org.springframework.boot") version "3.2.4"
     id("io.spring.dependency-management") version "1.1.4"
     id("com.github.node-gradle.node") version "7.0.0"
-//    id("org.springdoc.openapi-gradle-plugin") version "1.8.0"
     kotlin("jvm") version "1.9.23"
     kotlin("plugin.spring") version "1.9.23"
     kotlin("plugin.jpa") version "1.9.23"
