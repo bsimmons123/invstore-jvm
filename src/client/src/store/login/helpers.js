@@ -1,4 +1,4 @@
-export default class Helpers {
+export default class LoginHelpers {
   static paths = {
     root: '/api',
     loginPath: '/v1/auth/signin',

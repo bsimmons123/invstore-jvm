@@ -32,17 +32,12 @@ defineProps({
             <th
                 class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
             >
-              User Name
+              Label
             </th>
             <th
                 class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"
             >
-              Email
-            </th>
-            <th
-                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"
-            >
-              Catering List Label
+              Created By
             </th>
             <th
                 class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -65,17 +60,17 @@ defineProps({
                   <img src="../../assets/img/team-3.jpg" class="avatar avatar-sm me-3" alt="user2" />
                 </div>
                 <div class="d-flex flex-column justify-content-center">
-                  <h6 class="mb-0 text-sm">{{ value.user.name }}</h6>
-                  <p class="text-xs text-secondary mb-0">{{ value.user.email }}</p>
+                  <h6 class="mb-0 text-sm">{{ value.label }}</h6>
+                  <p class="text-xs text-secondary mb-0">{{ value.description }}</p>
                 </div>
               </div>
             </td>
             <td>
-              <p class="text-xs font-weight-bold mb-0">{{ value.label }}</p>
-              <p class="text-xs text-secondary mb-0">{{ value.description }}</p>
+              <p class="text-xs font-weight-bold mb-0">{{ value.user.name }}</p>
+              <p class="text-xs text-secondary mb-0">{{ value.user.email }}</p>
             </td>
             <td class="align-middle text-center text-sm">
-              <span class="badge badge-sm" :class="value.isActive ? 'bg-gradient-primary' : 'bg-gradient-secondary'">{{ value.isActive ? 'Online' : 'Offline' }}</span>
+              <span class="badge badge-sm" :class="value.isActive ? 'bg-gradient-primary' : 'bg-gradient-secondary'">{{ value.isActive ? 'Active' : 'Inactive' }}</span>
             </td>
             <td class="align-middle text-center">
               <span class="text-secondary text-xs font-weight-bold">{{ value.createdAt }}</span>

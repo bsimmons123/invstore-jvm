@@ -1,24 +1,47 @@
 import axios from 'axios';
+import {useStore} from "vuex";
+import {StoreMutations} from "@/store/login/mutations";
+import StoreIndex from "@/store/login/_StoreIndex";
 
-// Create a new instance of axios
-const instance = axios.create({withCredentials: true});
+let instance = null;
 
-// a helper function to get the JWT token
-function getToken() {
-    return localStorage.getItem('jwt'); // or wherever you store your token
-}
+export default function useApi() {
+    const store = useStore();
 
-// Add a request interceptor
-instance.interceptors.request.use((config) => {
-    const token = getToken();
+    if (!instance) {
+        instance = axios.create({withCredentials: true});
 
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        // Add a request interceptor
+        instance.interceptors.request.use((config) => {
+            const token = localStorage.getItem('jwt'); // or wherever you store your token
+
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+
+            return config;
+        }, (error) => {
+            return Promise.reject(error);
+        });
+
+        // Response interceptor
+        instance.interceptors.response.use((response) => {
+            // If response is ok
+            return response;
+        }, (error) => {
+            // If response is unauthorized
+            if (error.response.status === 401) {
+                // Redirect to sign-in route if 401 response received
+                localStorage.removeItem('jwt');
+
+                localStorage.removeItem('logged_in');
+                store.commit(`${StoreIndex.storeName}/${StoreMutations.SET_LOGGED_IN}`, false);
+
+                window.location.hash = "/signin?checklogin=true";
+            }
+            return Promise.reject(error);
+        });
     }
 
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
-
-export default instance;
+    return instance
+}

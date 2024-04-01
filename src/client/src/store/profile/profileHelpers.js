@@ -1,4 +1,4 @@
-export default class Helpers {
+export default class ProfileHelpers {
   static paths = {
     root: '/api',
     userPath: '/v1/user/',

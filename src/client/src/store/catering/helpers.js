@@ -1,4 +1,4 @@
-export default class Helpers {
+export default class CateringListHelpers {
   static paths = {
     root: '/api',
     cateringListPath: '/v1/cateringlist/',

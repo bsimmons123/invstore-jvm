@@ -18,6 +18,7 @@ import java.io.IOException
 
 @Component
 class AuthTokenFilter : OncePerRequestFilter() {
+
   @Autowired
   private val jwtUtils: JwtUtils? = null
 
@@ -41,9 +42,11 @@ class AuthTokenFilter : OncePerRequestFilter() {
         authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
 
         SecurityContextHolder.getContext().authentication = authentication
+      } else if (jwt != null) {
+        response.status = HttpServletResponse.SC_UNAUTHORIZED
       }
     } catch (e: Exception) {
-      Companion.logger.error("Cannot set user authentication: {}", e)
+      Companion.logger.error("Cannot set user authentication: {}", e.message)
     }
 
     filterChain.doFilter(request, response)

@@ -1,6 +1,6 @@
-import Helpers from './helpers';
 import { StoreMutations } from './mutations';
-import axios from "@/api/axios";
+import useApi from "@/api/axios";
+import CateringListHelpers from "@/store/catering/helpers";
 
 export const StoreActions = {
   getLists: 'getLists',
@@ -9,7 +9,9 @@ export const StoreActions = {
 export default {
     getLists({ commit }) {
         commit(StoreMutations.SET_LOADING_LIST, true)
-        axios.get(`${Helpers.paths.cateringListByUser()}`)
+        const api = useApi();
+
+        api.get(`${CateringListHelpers.paths.cateringListByUser()}`)
           .then((res) => {
               commit(StoreMutations.SET_LIST, res.data.value)
               commit(StoreMutations.SET_LOADING_LIST, false)

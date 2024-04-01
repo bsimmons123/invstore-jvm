@@ -1,9 +1,9 @@
-import Helpers from './helpers';
 import { StoreMutations } from './mutations';
 import router from "../../router";
 import MessageTypes from "@/store/global-helpers/MessageTypes";
 import RouterList from "@/store/global-helpers/routerList";
-import axios from "@/api/axios";
+import useApi from "@/api/axios";
+import LoginHelpers from "@/store/login/helpers";
 
 export const StoreActions = {
   login: 'login',
@@ -14,14 +14,16 @@ export const StoreActions = {
 
 export default {
   login({ commit, state }) {
-      if (state.user.password === '' || state.user.email === '') {
-          commit(StoreMutations.SET_MESSAGE, 'Please enter email and password');
-          commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
-          commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
-          commit(StoreMutations.SET_MESSAGE_TYPE, MessageTypes.warning);
-          return
-      }
-    axios.post(Helpers.paths.login(), state.user)
+    if (state.user.password === '' || state.user.email === '') {
+        commit(StoreMutations.SET_MESSAGE, 'Please enter email and password');
+        commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
+        commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
+        commit(StoreMutations.SET_MESSAGE_TYPE, MessageTypes.warning);
+        return
+    }
+    const api = useApi();
+
+    api.post(LoginHelpers.paths.login(), state.user)
       .then((res) => {
         localStorage.setItem('jwt', res.data.jwtToken);
         commit(StoreMutations.SET_LOGGED_IN, true);
@@ -46,14 +48,16 @@ export default {
       });
   },
   register({ commit, state }) {
-      if (state.user.password === '' || state.user.email === '' || state.user.username === '') {
-          commit(StoreMutations.SET_MESSAGE, 'Please enter email and password');
-          commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
-          commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
-          commit(StoreMutations.SET_MESSAGE_TYPE, MessageTypes.warning);
-          return
-      }
-    axios.post(Helpers.paths.register(), state.user)
+    if (state.user.password === '' || state.user.email === '' || state.user.username === '') {
+        commit(StoreMutations.SET_MESSAGE, 'Please enter email and password');
+        commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
+        commit(StoreMutations.SET_ALERT_COUNTDOWN, 5);
+        commit(StoreMutations.SET_MESSAGE_TYPE, MessageTypes.warning);
+        return
+    }
+    const api = useApi();
+
+    api.post(LoginHelpers.paths.register(), state.user)
       .then((res) => {
         commit(StoreMutations.SET_MESSAGE, res.data.message);
         commit(StoreMutations.TOGGLE_SHOW_MESSAGE, true);
@@ -75,7 +79,9 @@ export default {
       });
   },
   check_login({commit}) {
-      return axios.get(Helpers.paths.checkLogin())
+      const api = useApi();
+
+      return api.get(LoginHelpers.paths.checkLogin())
           .then((res) => {
               localStorage.setItem('jwt', res.data);
               commit(StoreMutations.SET_LOGGED_IN, true);
@@ -98,7 +104,9 @@ export default {
           });
   },
   logout(state) {
-    return axios.post(Helpers.paths.logout())
+    const api = useApi();
+
+    return api.post(LoginHelpers.paths.logout())
       .then((res) => {
         localStorage.removeItem('jwt');
         state.commit(StoreMutations.SET_LOGGED_IN, false);
