@@ -22,9 +22,10 @@ class CateringListService(
         return OperationResult.Success(dtoList)
     }
 
-    override fun findBySessionId(sessionId: String): Boolean {
+    override fun findBySessionId(sessionId: String): OperationResult.Success<CateringListDTO?> {
         val list = cateringListRepository.findCateringListsBySessionId(sessionId)
-        return list != null
+
+        return OperationResult.Success(list?.toCateringListDTO())
     }
 
     override fun create(cateringList: CateringListCreateDTO): OperationResult<CateringListDTO?> {
@@ -155,6 +156,6 @@ class CateringListService(
     }
 
     private fun validateSessionId(sessionId: String): Boolean {
-        return !findBySessionId(sessionId)
+        return findBySessionId(sessionId).data == null
     }
 }

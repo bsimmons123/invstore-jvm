@@ -31,7 +31,7 @@ class UserRepositoryTest {
         userService.create(user)
 
         val foundUser = userService.findByUsername("john")
-        assert(foundUser!!.id > 0)
+        assert(foundUser.data!!.id > 0)
     }
 
     @Test

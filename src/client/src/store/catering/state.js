@@ -6,7 +6,15 @@ export const StoreState = {
   createListLoading: 'createListLoading',
   createErrors: 'createErrors',
   createListAdapter: 'createListAdapter',
-  createListOption: 'createListOption'
+  createListOption: 'createListOption',
+
+  selList: 'selList',
+  items: 'items',
+  loadingItems: 'loadingLists',
+  createItemLoading: 'createListLoading',
+  createItemErrors: 'createErrors',
+  createItemAdapter: 'createListAdapter',
+  createItemOption: 'createListOption',
 };
 
 export default {
@@ -15,5 +23,13 @@ export default {
   createListLoading: false,
   createErrors: [],
   createListAdapter: createCateringListAdapter(),
-  createListOption: false
+  createListOption: false,
+
+  items: [],
+  loadingItems: false,
+  createItemLoading: false,
+  createItemErrors: [],
+  createItemAdapter: createCateringListAdapter(),
+  createItemOption: false,
+  selList: {}
 };

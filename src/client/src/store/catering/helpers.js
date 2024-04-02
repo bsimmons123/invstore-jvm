@@ -3,6 +3,7 @@ export default class CateringListHelpers {
     root: '/api',
     cateringListPath: '/v1/cateringlist/',
     cateringListUserPath: '/v1/cateringlist/user/',
+    cateringListSessionPath: '/v1/cateringlist/session/',
     cateringList() {
       return this.root + this.cateringListPath;
     },
@@ -11,6 +12,9 @@ export default class CateringListHelpers {
     },
     createCateringList() {
       return this.root + this.cateringListPath;
+    },
+    getCateringListBySessionId() {
+      return this.root + this.cateringListSessionPath;
     }
   };
 }

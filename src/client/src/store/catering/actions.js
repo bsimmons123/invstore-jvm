@@ -6,7 +6,8 @@ import {createCateringListAdapter} from "@/store/catering/CreateCateringListAdap
 
 export const StoreActions = {
   getLists: 'getLists',
-  createList: 'createList'
+  createList: 'createList',
+  getItems: 'getItems'
 };
 
 export default {
@@ -49,4 +50,19 @@ export default {
                 }
             );
     },
+    getItems({ commit }, sessionId) {
+        commit(StoreMutations.SET_LOADING_ITEM, true)
+        const api = useApi();
+
+        api.get(`${CateringListHelpers.paths.getCateringListBySessionId()}/${sessionId}`)
+            .then((res) => {
+                commit(StoreMutations.SET_SEL_LIST, res.data.value)
+                commit(StoreMutations.SET_LOADING_ITEM, false)
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_LOADING_ITEM, false)
+                }
+            );
+    }
 };

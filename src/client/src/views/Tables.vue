@@ -1,5 +1,4 @@
 <script setup>
-import ProjectsTable from "./components/ProjectsTable.vue";
 import CateringListTable from "@/views/components/CateringListTable.vue";
 import {useStore} from "vuex";
 import {computed, onMounted} from "vue";
@@ -64,11 +63,6 @@ onMounted(() => {
             />
           </div>
         </div>
-      </div>
-    </div>
-    <div class="mt-4 row">
-      <div class="col-12">
-        <projects-table />
       </div>
     </div>
   </div>

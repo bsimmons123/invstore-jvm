@@ -2,6 +2,7 @@ package com.invstore.invstorejvm.models.catering
 
 import com.invstore.invstorejvm.InvstoreJvmApplication
 import com.invstore.invstorejvm.models.users.User
+import com.invstore.invstorejvm.services.OperationResult
 import com.invstore.invstorejvm.services.ServiceUtils
 import com.invstore.invstorejvm.services.catering.CateringListService
 import com.invstore.invstorejvm.services.isValidPositiveInt
@@ -9,6 +10,7 @@ import com.invstore.invstorejvm.services.user.UserService
 import jakarta.transaction.Transactional
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -23,21 +25,21 @@ class CateringListTest {
     @Autowired
     private lateinit var userService: UserService
 
-    fun buildCateringList(): CateringList {
+    fun buildCateringList(): CateringListCreateDTO {
         var user: User = buildUser()
 
         user = userService.create(user)!!
 
-        return CateringList(
-            id = 0,
+        return CateringListCreateDTO(
             description = "Stinky items only",
             label = "Stink pot",
             isActive = true,
             itemLimit = 10,
             location = "Asgard",
             maxUsers = 2,
-            sessionId = null,
-            user = user
+            user = user.toUserDTO(),
+            visibility = CateringList.Visibility.PUBLIC,
+            notes = null
         )
     }
 
@@ -59,45 +61,34 @@ class CateringListTest {
     }
 
     fun findPersistedUser(): User? {
-        return userService.findByUsername("raphie")
+        return userService.findByUsername("raphie").data!!.toUser()
     }
 
     @Test
     @Transactional
     fun `Should persist a cateringList`() {
-        var cateringList = buildCateringList()
+        val cateringList = buildCateringList()
 
-        cateringList = cateringListService.create(cateringList)!!
+        val createdList = cateringListService.create(cateringList)
 
         val user = findPersistedUser()
 
-        val cateringLists = cateringListService.findByUserId(user!!.id)
-        assert(cateringLists!!.isNotEmpty())
-        assert(cateringList.id.toInt() > 0)
-    }
+        when(createdList) {
+            is OperationResult.Success -> {
+                assert(createdList.data!!.id.toInt() > 0)
 
-    @Test
-    @Transactional
-    fun `Error when id is greater than one for create`() {
-        val cateringList = buildCateringList().copy(id = 4)
+            }
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.create(cateringList) }, errorList)
+            is OperationResult.Error -> fail()
+        }
 
-        assert(result == null)
-        assert(errorList.isNotEmpty() && errorList.size == 1)
-    }
+        when (val cateringLists = cateringListService.findByUserId(user!!.id)) {
+            is OperationResult.Success -> {
+                assert(cateringLists.data!!.isNotEmpty())
+            }
 
-    @Test
-    @Transactional
-    fun `Error when userId is greater than one for create`() {
-        val cateringList = buildCateringList().copy(user = buildUser())
-
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.create(cateringList) }, errorList)
-
-        assert(result == null)
-        assert(errorList.isNotEmpty() && errorList.size == 1)
+            is OperationResult.Error -> fail()
+        }
     }
 
     @Test
@@ -105,11 +96,16 @@ class CateringListTest {
     fun `Error when inactive is set for create`() {
         val cateringList = buildCateringList().copy(isActive = false)
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.create(cateringList) }, errorList)
+        val result = cateringListService.create(cateringList)
 
-        assert(result == null)
-        assert(errorList.isNotEmpty() && errorList.size == 1)
+        when(result) {
+            is OperationResult.Error -> {
+                assert(result.errors.isNotEmpty())
+            }
+            is OperationResult.Success -> {
+                fail()
+            }
+        }
     }
 
     @Test
@@ -117,11 +113,16 @@ class CateringListTest {
     fun `itemList is null for create, defaults to 100`() {
         val cateringList = buildCateringList().copy(itemLimit = null)
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.create(cateringList) }, errorList)
+        val result = cateringListService.create(cateringList)
 
-        assert(result != null)
-        assert(result!!.itemLimit == 100)
+        when(result) {
+            is OperationResult.Error -> {
+                fail()
+            }
+            is OperationResult.Success -> {
+                assert(result.data!!.itemLimit == 100)
+            }
+        }
     }
 
     @Test
@@ -129,23 +130,29 @@ class CateringListTest {
     fun `maxUsers is null for create, defaults to 10`() {
         val cateringList = buildCateringList().copy(maxUsers = null)
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.create(cateringList) }, errorList)
-
-        assert(result != null)
-        assert(result!!.maxUsers == 10)
+        when(val result = cateringListService.create(cateringList)) {
+            is OperationResult.Error -> {
+                fail()
+            }
+            is OperationResult.Success -> {
+                assert(result.data!!.maxUsers == 10)
+            }
+        }
     }
 
     @Test
     @Transactional
     fun `sessionId is unique for create`() {
-        val cateringList = buildCateringList().copy(sessionId = "Bob the builder")
+        val cateringList = buildCateringList()
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.create(cateringList) }, errorList)
-
-        assert(result != null)
-        assert(result!!.sessionId != "Bob the builder")
-        assert(result.sessionId!!.length == 8)
+        when(val result = cateringListService.create(cateringList)) {
+            is OperationResult.Error -> {
+                fail()
+            }
+            is OperationResult.Success -> {
+                assert(result.data != null)
+                assert(result.data!!.sessionId!!.length == 8)
+            }
+        }
     }
 }

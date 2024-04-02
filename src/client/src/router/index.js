@@ -7,12 +7,13 @@ import Profile from "../views/Profile.vue";
 import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
 import RouterList from "@/store/global-helpers/routerList";
+import CateringList from "@/views/CateringList.vue";
 
 const routes = [
   {
     path: "/",
     name: "/",
-    value: "/",  // added line
+    value: "/",
     redirect: "/dashboard-default",
     meta: {
       requiresAuth: true
@@ -21,7 +22,7 @@ const routes = [
   {
     path: "/dashboard-default",
     name: "Dashboard",
-    value: "Dashboard",  // added line
+    value: "Dashboard",
     component: Dashboard,
     meta: {
       requiresAuth: true
@@ -30,8 +31,17 @@ const routes = [
   {
     path: "/tables",
     name: "Tables",
-    value: "Tables",  // added line
+    value: "Tables",
     component: Tables,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/cateringlist/:sessionId",
+    name: "CateringList",
+    value: "CateringList",
+    component: CateringList,
     meta: {
       requiresAuth: true
     }
@@ -39,7 +49,7 @@ const routes = [
   {
     path: "/billing",
     name: "Billing",
-    value: "Billing",  // added line
+    value: "Billing",
     component: Billing,
     meta: {
       requiresAuth: true
@@ -48,7 +58,7 @@ const routes = [
   {
     path: "/virtual-reality",
     name: "Virtual Reality",
-    value: "Virtual Reality",  // added line
+    value: "Virtual Reality",
     component: VirtualReality,
     meta: {
       requiresAuth: true
@@ -57,7 +67,7 @@ const routes = [
   {
     path: "/profile",
     name: "Profile",
-    value: "Profile",  // added line
+    value: "Profile",
     component: Profile,
     meta: {
       requiresAuth: true
@@ -66,13 +76,13 @@ const routes = [
   {
     path: "/signin",
     name: "Signin",
-    value: "Signin",  // added line
+    value: "Signin",
     component: Signin,
   },
   {
     path: "/signup",
     name: "Signup",
-    value: "Signup",  // added line
+    value: "Signup",
     component: Signup,
   },
   {

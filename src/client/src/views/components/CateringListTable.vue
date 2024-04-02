@@ -92,9 +92,19 @@ const emit = defineEmits(['show:creatList'])
               <a href="javascript:;"
                  class="text-secondary font-weight-bold text-xs"
                  data-toggle="tooltip"
-                 data-original-title="Edit user">
+                 data-original-title="Edit list">
                 Edit
               </a>
+            </td>
+            <td class="align-middle">
+                <router-link
+                    class="text-secondary font-weight-bold text-xs"
+                    data-toggle="tooltip"
+                    data-original-title="Edit user"
+                    :to="{ name: 'CateringList', params: { sessionId: value.sessionId } }"
+                >
+                  View
+                </router-link>
             </td>
           </tr>
           </tbody>

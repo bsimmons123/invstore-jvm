@@ -1,19 +1,15 @@
 package com.invstore.invstorejvm.controllers.catering
 
-import org.slf4j.LoggerFactory
 import com.invstore.invstorejvm.ApiResponse
-import com.invstore.invstorejvm.models.catering.CateringList
 import com.invstore.invstorejvm.models.catering.CateringListCreateDTO
 import com.invstore.invstorejvm.models.catering.CateringListDTO
 import com.invstore.invstorejvm.models.catering.CateringListEditDTO
-import com.invstore.invstorejvm.security.services.UserDetailsImpl
 import com.invstore.invstorejvm.services.ServiceUtils
 import com.invstore.invstorejvm.services.catering.CateringListService
 import com.invstore.invstorejvm.services.user.UserService
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
@@ -32,6 +28,15 @@ class CateringListController(
         log.info("GET /api/v1/cateringlist/$id")
 
         val result = cateringListService.findById(id)
+
+        return ServiceUtils.handleResult(result)
+    }
+
+    @GetMapping("/session/{sessionId}")
+    fun getCateringListBySessionId(@PathVariable sessionId: String, principal: Principal): ResponseEntity<ApiResponse<CateringListDTO?>> {
+        log.info("GET /api/v1/cateringlist/$sessionId")
+
+        val result = cateringListService.findBySessionId(sessionId)
 
         return ServiceUtils.handleResult(result)
     }

@@ -21,9 +21,18 @@ defineProps({
     </label>
     <textarea
       :id="id"
-      class="form-control"
+      class="form-control large-text"
       :rows="rows"
-      :placeholder="placeholder"
+      :value="placeholder"
+      readonly
     ></textarea>
   </div>
 </template>
+
+<style scoped>
+.large-text {
+  overflow: auto;
+  line-height: 1.5;
+  resize: none; /* Optional: Disable resizing */
+}
+</style>

@@ -7,7 +7,7 @@ import com.invstore.invstorejvm.services.OperationResult
 
 interface ICateringListService {
     fun findByUserId(userId: Long): OperationResult<List<CateringListDTO>?>
-    fun findBySessionId(sessionId: String): Boolean
+    fun findBySessionId(sessionId: String): OperationResult.Success<CateringListDTO?>
     fun create(cateringList: CateringListCreateDTO): OperationResult<CateringListDTO?>
     fun update(cateringList: CateringList): OperationResult<CateringListDTO?>
     fun delete(cateringList: CateringList)
