@@ -1,9 +1,19 @@
+import {createCateringListAdapter} from "@/store/catering/CreateCateringListAdapter";
+
 export const StoreState = {
   list: 'list',
-  loadingLists: 'loadingLists'
+  loadingLists: 'loadingLists',
+  createListLoading: 'createListLoading',
+  createErrors: 'createErrors',
+  createListAdapter: 'createListAdapter',
+  createListOption: 'createListOption'
 };
 
 export default {
   list: [],
-  loadingLists: false
+  loadingLists: false,
+  createListLoading: false,
+  createErrors: [],
+  createListAdapter: createCateringListAdapter(),
+  createListOption: false
 };

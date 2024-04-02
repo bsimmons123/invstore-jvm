@@ -1,7 +1,9 @@
 package com.invstore.invstorejvm.services.user
 
 import com.invstore.invstorejvm.models.users.User
+import com.invstore.invstorejvm.models.users.UserDTO
 import com.invstore.invstorejvm.repositories.users.UserRepository
+import com.invstore.invstorejvm.services.OperationResult
 import com.invstore.invstorejvm.services.isValidNonPositiveInt
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -13,8 +15,8 @@ class UserService(private var repository: UserRepository) : IUserService {
         return repository.findByEmail(email)
     }
 
-    override fun findByUsername(username: String): User? {
-        return repository.findByUsername(username)
+    override fun findByUsername(username: String): OperationResult.Success<UserDTO?> {
+        return OperationResult.Success(repository.findByUsername(username)?.toUserDTO())
     }
 
     override fun findByProviderId(id: String): User? {

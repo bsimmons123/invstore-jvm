@@ -49,4 +49,30 @@ data class User(
 
     @Column(length = 50)
     var timezone: String = "UTC"
-)
+) {
+    fun toUserDTO(): UserDTO {
+        return UserDTO(
+            username,
+            email,
+            name,
+            id
+        )
+    }
+}
+
+data class UserDTO(
+    val username: String?,
+    val email: String?,
+    val name: String?,
+    val id: Long
+) {
+    fun toUser(): User {
+        return User(
+            id = this.id,
+            username = this.username ?: "",
+            email = this.email ?: "",
+            name = this.name ?: "",
+            isActive = true
+        )
+    }
+}

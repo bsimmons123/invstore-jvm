@@ -20,6 +20,10 @@ defineProps({
     type: String,
     default: "",
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  }
 });
 </script>
 <template>
@@ -31,6 +35,7 @@ defineProps({
       type="checkbox"
       :name="name"
       :checked="checked"
+      :disabled="disabled"
     />
     <label class="form-check-label" :class="labelClass" :for="id">
       <slot />

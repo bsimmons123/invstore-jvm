@@ -1,7 +1,7 @@
 package com.invstore.invstorejvm.controllers.user
 
 import com.invstore.invstorejvm.ApiResponse
-import com.invstore.invstorejvm.models.users.User
+import com.invstore.invstorejvm.models.users.UserDTO
 import com.invstore.invstorejvm.services.ServiceUtils
 import com.invstore.invstorejvm.services.user.UserService
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -20,29 +20,11 @@ class UserController(private val userService: UserService) {
     private val log = LoggerFactory.getLogger(UserController::class.java)
 
     @GetMapping("/")
-    fun checkUserSession(principal: Principal?): ResponseEntity<ApiResponse<UserDTO>> {
+    fun checkUserSession(principal: Principal?): ResponseEntity<ApiResponse<UserDTO?>> {
         log.info("GET /api/v1/user")
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ userService.findByUsername(principal?.name ?: "") }, errorList)
+        val result = userService.findByUsername(principal?.name ?: "")
 
-
-        if (result != null) {
-            val userDto = UserDTO(
-                email = result.email,
-                username = result.username,
-                name = result.name,
-                id = result.id
-            )
-            return ResponseEntity.ok(ApiResponse(true, userDto, null))
-        }
-        else return ResponseEntity.badRequest().body(ApiResponse(false, null, listOf("Not Authenticated")))
+        return ServiceUtils.handleResult(result)
     }
 }
-
-data class UserDTO(
-    val username: String,
-    val email: String,
-    val name: String,
-    val id: Long
-    )

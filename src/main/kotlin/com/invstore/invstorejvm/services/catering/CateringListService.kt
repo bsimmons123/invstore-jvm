@@ -1,23 +1,25 @@
 package com.invstore.invstorejvm.services.catering
 
-import com.fasterxml.jackson.databind.util.Converter
-import com.invstore.invstorejvm.controllers.user.UserDTO
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.invstore.invstorejvm.models.catering.CateringList
+import com.invstore.invstorejvm.models.catering.CateringListCreateDTO
 import com.invstore.invstorejvm.models.catering.CateringListDTO
+import com.invstore.invstorejvm.models.users.UserDTO
 import com.invstore.invstorejvm.repositories.catering.CateringListRepository
-import com.invstore.invstorejvm.services.isValidNonPositiveInt
-import com.invstore.invstorejvm.services.isValidPositiveInt
+import com.invstore.invstorejvm.services.OperationResult
+import io.swagger.v3.core.util.Json
 import org.springframework.stereotype.Service
 
 @Service
 class CateringListService(
     private val cateringListRepository: CateringListRepository
 ) : ICateringListService {
-    override fun findByUserId(userId: Long): List<CateringListDTO>? {
+    override fun findByUserId(userId: Long): OperationResult<List<CateringListDTO>?> {
         val list = cateringListRepository.findCateringListsByUserId(userId)
 
-        val dtoList: List<CateringListDTO>? = list?.map { convertToDto(it) }
-        return dtoList
+        val dtoList: List<CateringListDTO>? = list?.map { it.toCateringListDTO() }
+
+        return OperationResult.Success(dtoList)
     }
 
     override fun findBySessionId(sessionId: String): Boolean {
@@ -25,84 +27,115 @@ class CateringListService(
         return list != null
     }
 
-    override fun create(cateringList: CateringList): CateringList? {
-        val errors = mutableListOf<String>()
-
-        // ID
-        if (cateringList.id.toInt() != 0) {
-            errors.add("Invalid id. Id must be blank")
-        }
+    override fun create(cateringList: CateringListCreateDTO): OperationResult<CateringListDTO?> {
+        val errors = hashMapOf<String, String>()
+        val list = cateringList.toCateringList()
 
         // USER
-        if (cateringList.user.id.toInt() == 0) {
-            errors.add("User must be set.")
+        if (list.user.id.toInt() == 0) {
+            errors["User"] = "User must be set."
+        }
+
+        // LABEL
+        if (list.label?.isBlank() == true) {
+            errors["Label"] = ("Label cannot be blank")
+        }
+
+        // DESCRIPTION
+        if (list.description?.isBlank() == true) {
+            errors["Description"] = ("Description cannot be blank")
         }
 
         // IS ACTIVE
-        if (!cateringList.isActive) {
-            errors.add("Cannot create an inactive List")
+        if (!list.isActive) {
+            errors["IsActive"] = ("Cannot create an inactive List")
         }
 
         // ITEM LIMIT
-        if (cateringList.itemLimit == null) {
+        if (list.itemLimit == null) {
             // Default item limit to 100 for an empty itemLimit
-            cateringList.itemLimit = 100
+            list.itemLimit = 100
         }
 
         // MAX USERS
-        if (cateringList.maxUsers == null) {
-            // Default maxUsers to 10
-            cateringList.maxUsers = 10
+        if (list.maxUsers == null) {
+            // Default maxUsers to 10 for an empty itemLimit
+            list.maxUsers = 10
         }
 
-        //  Generate sessionId now and overwrite the value sent (should be null)
-        cateringList.sessionId = generateSessionId()
+        // NOTES
+        if ((list.notes ?: "").length > 1000) {
+            errors["Notes"] = ("Notes cannot exceed 1000 characters")
+        }
 
-        // If any errors, throw exception or handle as per your need
+        // Generate sessionId now and overwrite the value sent (should be null)
+        list.sessionId = generateSessionId()
+
+        // If any errors, throw exception
         if (errors.isNotEmpty()) {
-            throw IllegalArgumentException(errors.joinToString("| "))
+            return OperationResult.Error(errors)
+        } else {
+            val result = cateringListRepository.save(list).toCateringListDTO()
+            return OperationResult.Success(result)
         }
-        return cateringListRepository.save(cateringList)
     }
 
-    override fun update(cateringList: CateringList): CateringList? {
-        val errors = mutableListOf<String>()
+    override fun update(cateringList: CateringList): OperationResult<CateringListDTO?> {
+        val errors = hashMapOf<String, String>()
 
         // ID
         if (cateringList.id.toInt() <= 0) {
-            errors.add("Invalid id. Id must be a valid integer")
+            errors["Id"] = "Invalid id. Id must be a valid integer"
+        }
+
+        // LABEL
+        if (cateringList.label?.isBlank() == true) {
+            errors["Label"] = "Label cannot be blank"
+        }
+
+        // DESCRIPTION
+        if (cateringList.description?.isBlank() == true) {
+            errors["Description"] = "Description cannot be blank"
         }
 
         // USER
-        if (cateringList.user.id > 0) {
-            errors.add("Invalid User")
+        if (cateringList.user.id <= 0) {
+            errors["User"] = "Invalid User"
         }
 
         // ITEM LIMIT
         if (cateringList.itemLimit == null) {
             // Default item limit to 100 for an empty itemLimit
-            errors.add("Cannot have a blank item limit")
+            errors["ItemLimit"] = "Cannot have a blank item limit"
         }
 
         // MAX USERS
         if (cateringList.maxUsers == null || cateringList.maxUsers == 0) {
-            // Default maxUsers to 10
-            errors.add("Cannot set Max Users to 0")
+            // Default maxUsers to 10 for an empty itemLimit
+            errors["MaxUsers"] = "Cannot set Max Users to 0"
         }
 
-        // If any errors, throw exception or handle as per your need
-        if (errors.isNotEmpty()) {
-            throw IllegalArgumentException(errors.joinToString("| "))
+        // NOTES
+        if ((cateringList.notes ?: "").length > 1000) {
+            errors["Notes"] = "Notes cannot exceed 1000 characters"
         }
-        return cateringListRepository.save(cateringList)
+
+        // If any errors, throw exception
+        if (errors.isNotEmpty()) {
+            return OperationResult.Error(errors)
+        } else {
+            val result = cateringListRepository.save(cateringList)
+            return OperationResult.Success(result.toCateringListDTO())
+        }
     }
 
     override fun delete(cateringList: CateringList) {
         cateringListRepository.delete(cateringList)
     }
 
-    override fun findById(id: Long): CateringList? {
-        return cateringListRepository.findById(id).get()
+    override fun findById(id: Long): OperationResult.Success<CateringListDTO?> {
+        val list =  cateringListRepository.findById(id).get()
+        return OperationResult.Success(list.toCateringListDTO())
     }
 
     /**
@@ -123,27 +156,5 @@ class CateringListService(
 
     private fun validateSessionId(sessionId: String): Boolean {
         return !findBySessionId(sessionId)
-    }
-
-    fun convertToDto(entity: CateringList): CateringListDTO {
-        return CateringListDTO(
-            entity.id,
-            entity.label,
-            entity.description,
-            entity.maxUsers,
-            entity.sessionId,
-            entity.itemLimit,
-            UserDTO(
-                username = entity.user.username,
-                email = entity.user.email,
-                name = entity.user.name,
-                id = entity.user.id
-            ),
-            entity.createdAt,
-            entity.updatedAt,
-            entity.isActive,
-            entity.location,
-            entity.visibility
-        )
     }
 }

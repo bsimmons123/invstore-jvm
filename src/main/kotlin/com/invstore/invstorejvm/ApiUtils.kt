@@ -5,4 +5,4 @@ class ApiUtils {
 
 }
 
-data class ApiResponse<T>(val success: Boolean, val value: T?, val errors: List<String>?)
+data class ApiResponse<T>(val success: Boolean, val value: T?, val errors: MutableMap<String, String>?)

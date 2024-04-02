@@ -3,7 +3,9 @@ package com.invstore.invstorejvm.controllers.catering
 import org.slf4j.LoggerFactory
 import com.invstore.invstorejvm.ApiResponse
 import com.invstore.invstorejvm.models.catering.CateringList
+import com.invstore.invstorejvm.models.catering.CateringListCreateDTO
 import com.invstore.invstorejvm.models.catering.CateringListDTO
+import com.invstore.invstorejvm.models.catering.CateringListEditDTO
 import com.invstore.invstorejvm.security.services.UserDetailsImpl
 import com.invstore.invstorejvm.services.ServiceUtils
 import com.invstore.invstorejvm.services.catering.CateringListService
@@ -26,46 +28,46 @@ class CateringListController(
     private val log = LoggerFactory.getLogger(CateringListController::class.java)
 
     @GetMapping("/{id}")
-    fun getCateringList(@PathVariable id: Long, principal: Principal): ResponseEntity<ApiResponse<CateringList>> {
+    fun getCateringList(@PathVariable id: Long, principal: Principal): ResponseEntity<ApiResponse<CateringListDTO?>> {
         log.info("GET /api/v1/cateringlist/$id")
 
-        val cateringList = cateringListService.findById(id)
+        val result = cateringListService.findById(id)
 
-        return ResponseEntity.ok(ApiResponse(true, cateringList, null))
+        return ServiceUtils.handleResult(result)
     }
 
     @GetMapping("/user/")
-    fun getCateringListByUser(principal: Principal): ResponseEntity<ApiResponse<List<CateringListDTO>>> {
+    fun getCateringListByUser(principal: Principal): ResponseEntity<ApiResponse<List<CateringListDTO>?>> {
         log.info("GET /api/v1/cateringlist/user/")
 
         val u = userService.findByUsername(principal.name)
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.findByUserId(u?.id ?: 0) }, errorList)
+        val result = cateringListService.findByUserId(u.data?.id ?: 0)
 
-
-        return ResponseEntity.ok(ApiResponse(true, result, null))
+        return ServiceUtils.handleResult(result)
     }
 
     @PostMapping("/")
-    fun createCateringList(@RequestBody cateringList: CateringList, principal: Principal): ResponseEntity<ApiResponse<CateringList>> {
+    fun createCateringList(@RequestBody cateringList: CateringListCreateDTO, principal: Principal): ResponseEntity<ApiResponse<CateringListDTO?>> {
         log.info("POST /api/v1/cateringlist/")
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.create(cateringList) }, errorList)
+        val u = userService.findByUsername(principal.name)
 
-        return if (result != null) ResponseEntity.ok(ApiResponse(true, result, null))
-        else ResponseEntity.badRequest().body(ApiResponse(false, null, errorList))
+        if (u.data != null) {
+            cateringList.user = u.data
+        }
+
+        val result = cateringListService.create(cateringList)
+
+        return ServiceUtils.handleResult(result)
     }
 
     @PutMapping("/")
-    fun updateCateringList(@RequestBody cateringList: CateringList, principal: Principal): ResponseEntity<ApiResponse<CateringList>> {
+    fun updateCateringList(@RequestBody cateringList: CateringListEditDTO, principal: Principal): ResponseEntity<ApiResponse<CateringListDTO?>> {
         log.info("PUT /api/v1/cateringlist/")
 
-        val errorList = mutableListOf<String>()
-        val result = ServiceUtils.handleServiceCall({ cateringListService.update(cateringList) }, errorList)
+        val result = cateringListService.update(cateringList.toCateringList(cateringListService))
 
-        return if (result != null) ResponseEntity.ok(ApiResponse(true, result, null))
-        else ResponseEntity.badRequest().body(ApiResponse(false, null, errorList))
+        return ServiceUtils.handleResult(result)
     }
 }

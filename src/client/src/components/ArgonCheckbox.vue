@@ -12,6 +12,10 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 </script>
 <template>
@@ -22,6 +26,7 @@ defineProps({
       type="checkbox"
       :name="name"
       :checked="checked"
+      :disabled="disabled"
     />
     <label :for="id" class="custom-control-label" :class="$attrs.class">
       <slot />

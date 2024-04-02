@@ -9,5 +9,8 @@ export default class CateringListHelpers {
     cateringListByUser() {
       return this.root + this.cateringListUserPath;
     },
+    createCateringList() {
+      return this.root + this.cateringListPath;
+    }
   };
 }

@@ -16,13 +16,26 @@ defineProps({
     type: Object,
     default: () => ({}),
   },
+  isExpanded: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const emit = defineEmits(['show:creatList'])
 </script>
 
 <template>
   <div class="card">
-    <div class="card-header pb-0">
+    <div class="card-header pb-0 d-flex justify-content-between align-items-center">
       <h6>{{ title }}</h6>
+      <button class="btn btn-primary"
+              @click.stop.prevent="emit('show:creatList')"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseCreateList"
+              :aria-expanded="!isExpanded.toString()"
+              aria-controls="collapseCreateList"
+      >Create</button>
     </div>
     <div class="card-body px-0 pt-0 pb-2">
       <div class="table-responsive p-0">
