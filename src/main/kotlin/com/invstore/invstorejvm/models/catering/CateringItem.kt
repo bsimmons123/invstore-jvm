@@ -32,3 +32,24 @@ data class CateringItem(
 ) {
     enum class Status { PENDING, CONFIRMED, DELIVERED }
 }
+
+data class CateringItemCreateDTO(
+    var label: String?,
+    var type: CateringItemType?,
+    var list: CateringListCreateDTO?,
+    var description: String?,
+    var quantity: Int?,
+    var status: CateringItem.Status
+) {
+    fun toCateringItemDto(): CateringItem {
+        return CateringItem(
+            id = 0,
+            label = this.label,
+            type = this.type,
+            description = this.description,
+            list = this.list?.toCateringList(),
+            quantity = this.quantity ?: 1,
+            status = this.status
+        )
+    }
+}
