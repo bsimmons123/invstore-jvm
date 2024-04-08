@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.invstore.invstorejvm.models.catering.CateringList
 import com.invstore.invstorejvm.models.catering.CateringListCreateDTO
 import com.invstore.invstorejvm.models.catering.CateringListDTO
+import com.invstore.invstorejvm.models.catering.CateringListEditDTO
 import com.invstore.invstorejvm.models.users.UserDTO
 import com.invstore.invstorejvm.repositories.catering.CateringListRepository
 import com.invstore.invstorejvm.services.OperationResult
@@ -39,17 +40,17 @@ class CateringListService(
 
         // LABEL
         if (list.label?.isBlank() == true) {
-            errors["Label"] = ("Label cannot be blank")
+            errors["Label"] = "Label cannot be blank"
         }
 
         // DESCRIPTION
         if (list.description?.isBlank() == true) {
-            errors["Description"] = ("Description cannot be blank")
+            errors["Description"] = "Description cannot be blank"
         }
 
         // IS ACTIVE
         if (!list.isActive) {
-            errors["IsActive"] = ("Cannot create an inactive List")
+            errors["IsActive"] = "Cannot create an inactive List"
         }
 
         // ITEM LIMIT
@@ -66,7 +67,7 @@ class CateringListService(
 
         // NOTES
         if ((list.notes ?: "").length > 1000) {
-            errors["Notes"] = ("Notes cannot exceed 1000 characters")
+            errors["Notes"] = "Notes cannot exceed 1000 characters"
         }
 
         // Generate sessionId now and overwrite the value sent (should be null)
@@ -81,7 +82,7 @@ class CateringListService(
         }
     }
 
-    override fun update(cateringList: CateringList): OperationResult<CateringListDTO?> {
+    override fun update(cateringList: CateringListEditDTO): OperationResult<CateringListDTO?> {
         val errors = hashMapOf<String, String>()
 
         // ID
@@ -100,7 +101,7 @@ class CateringListService(
         }
 
         // USER
-        if (cateringList.user.id <= 0) {
+        if (cateringList.user?.id!! <= 0) {
             errors["User"] = "Invalid User"
         }
 
@@ -125,7 +126,7 @@ class CateringListService(
         if (errors.isNotEmpty()) {
             return OperationResult.Error(errors)
         } else {
-            val result = cateringListRepository.save(cateringList)
+            val result = cateringListRepository.save(cateringList.toCateringList(this))
             return OperationResult.Success(result.toCateringListDTO())
         }
     }
@@ -134,9 +135,15 @@ class CateringListService(
         cateringListRepository.delete(cateringList)
     }
 
-    override fun findById(id: Long): OperationResult.Success<CateringListDTO?> {
-        val list =  cateringListRepository.findById(id).get()
-        return OperationResult.Success(list.toCateringListDTO())
+    override fun findById(id: Long): OperationResult<CateringListDTO?> {
+        val list =  cateringListRepository.findById(id)
+        if (list.isEmpty) {
+            val errors = hashMapOf<String, String>()
+            errors["EMPTY"] = "No List by that ID"
+            return OperationResult.Error(errors)
+        } else {
+            return OperationResult.Success(list.get().toCateringListDTO())
+        }
     }
 
     /**

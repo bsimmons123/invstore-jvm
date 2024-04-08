@@ -18,10 +18,13 @@ const cateringListState = store.state.cateringList;
 
 const list = computed(() => cateringListState[StoreState.selList]);
 
-const getItems = (id) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getItems}`, id);
+const getList = (id) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getList}`, id);
+const getItems = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getItems}`);
 
 onMounted(() => {
-  getItems(route.params.sessionId)
+  getList(route.params.sessionId).then(() => {
+    getItems()
+  })
 });
 </script>
 <template>

@@ -2,6 +2,7 @@ package com.invstore.invstorejvm.models.catering
 
 import com.invstore.invstorejvm.models.users.User
 import com.invstore.invstorejvm.models.users.UserDTO
+import com.invstore.invstorejvm.services.OperationResult
 import com.invstore.invstorejvm.services.catering.CateringListService
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -10,7 +11,7 @@ import java.time.LocalDateTime
 @Table(name = "c_list")
 data class CateringList(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    var id: Long,
 
     var label: String?,
     var description: String?,
@@ -123,7 +124,15 @@ data class CateringListEditDTO(
     val notes: String?
 ) {
     fun toCateringList(cateringListService: CateringListService): CateringList {
-        val oldList = cateringListService.findById(this.id).data!!
+        val listRes = cateringListService.findById(this.id)
+        var oldList: CateringListDTO? = null
+        when (listRes) {
+            is OperationResult.Error -> {
+                throw IllegalArgumentException("Catering list ${this.id} not found")
+            }
+            is OperationResult.Success -> oldList = listRes.data!!
+        }
+
         return CateringList(
             id = this.id,
             label = this.label ?: oldList.label,

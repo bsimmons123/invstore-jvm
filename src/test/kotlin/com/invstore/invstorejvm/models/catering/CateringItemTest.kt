@@ -2,7 +2,11 @@ package com.invstore.invstorejvm.models.catering
 
 import com.invstore.invstorejvm.InvstoreJvmApplication
 import com.invstore.invstorejvm.models.users.User
+import com.invstore.invstorejvm.repositories.catering.CateringItemTypeRepository
+import com.invstore.invstorejvm.repositories.catering.CateringListRepository
 import com.invstore.invstorejvm.services.OperationResult
+import com.invstore.invstorejvm.services.catering.CateringItemService
+import com.invstore.invstorejvm.services.catering.CateringItemTypeService
 import com.invstore.invstorejvm.services.catering.CateringListService
 import com.invstore.invstorejvm.services.user.UserService
 import jakarta.transaction.Transactional
@@ -17,39 +21,72 @@ import java.time.LocalDateTime
 @ActiveProfiles("test")
 class CateringItemTest {
     @Autowired
-    private lateinit var cateringListService: CateringListService
+    private lateinit var cateringListRepository: CateringListRepository
+
+    @Autowired
+    private lateinit var cateringItemTypeRepo: CateringItemTypeRepository
+
+    @Autowired
+    private lateinit var cateringItemService: CateringItemService
 
     @Autowired
     private lateinit var userService: UserService
 
     fun buildCateringItem(): CateringItemCreateDTO {
-        val list = buildCateringList()
+        val createdList = cateringListRepository.save(buildCateringList())
+        val createdType = cateringItemTypeRepo.save(buildCateringType(createdList))
 
         return CateringItemCreateDTO(
             label = "Apple bottom jeans",
             description = "Spaghettios",
-            list = list,
+            listId = createdList.id,
+            quantity = 10,
+            status = CateringItem.Status.PENDING,
+            type = createdType
+        )
+    }
+
+    fun buildCateringItemNoType(): CateringItemCreateDTO {
+        val createdList = cateringListRepository.save(buildCateringList())
+
+        return CateringItemCreateDTO(
+            label = "Apple bottom jeans",
+            description = "Spaghettios",
+            listId = createdList.id,
             quantity = 10,
             status = CateringItem.Status.PENDING,
             type = CateringItemType()
         )
     }
 
-    fun buildCateringList(): CateringListCreateDTO {
+    fun buildCateringType(list: CateringList): CateringItemType {
+        return CateringItemType(
+            id = 0,
+            label = "This be a type",
+            description = "This isnt a description",
+            list = list
+        )
+    }
+
+    fun buildCateringList(): CateringList {
         var user: User = buildUser()
 
         user = userService.create(user)!!
 
-        return CateringListCreateDTO(
+        return CateringList(
             description = "Stinky items only",
             label = "Stink pot",
             isActive = true,
             itemLimit = 10,
             location = "Asgard",
             maxUsers = 2,
-            user = user.toUserDTO(),
+            user = user,
             visibility = CateringList.Visibility.PUBLIC,
-            notes = null
+            notes = null,
+            id = 0,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now(),
+            sessionId = "EHWHOKNOWS"
         )
     }
 
@@ -70,31 +107,15 @@ class CateringItemTest {
         )
     }
 
-    fun findPersistedUser(): User? {
-        return userService.findByUsername("raphie").data!!.toUser()
-    }
-
     @Test
     @Transactional
-    fun `Should persist a cateringList`() {
-        val cateringList = buildCateringList()
+    fun `Should persist a cateringItem`() {
+        val cateringItem = buildCateringItem()
 
-        val createdList = cateringListService.create(cateringList)
-
-        val user = findPersistedUser()
-
-        when(createdList) {
+        when(val createdItem = cateringItemService.create(cateringItem)) {
             is OperationResult.Success -> {
-                assert(createdList.data!!.id.toInt() > 0)
-
-            }
-
-            is OperationResult.Error -> fail()
-        }
-
-        when (val cateringLists = cateringListService.findByUserId(user!!.id)) {
-            is OperationResult.Success -> {
-                assert(cateringLists.data!!.isNotEmpty())
+                assert(createdItem.data!!.id.toInt() > 0)
+                assert(createdItem.data!!.listId.toInt() > 0)
             }
 
             is OperationResult.Error -> fail()
@@ -103,12 +124,10 @@ class CateringItemTest {
 
     @Test
     @Transactional
-    fun `Error when inactive is set for create`() {
-        val cateringList = buildCateringList().copy(isActive = false)
+    fun `Error when description is null for create`() {
+        val cateringList = buildCateringItem().copy(description = "")
 
-        val result = cateringListService.create(cateringList)
-
-        when(result) {
+        when(val result = cateringItemService.create(cateringList)) {
             is OperationResult.Error -> {
                 assert(result.errors.isNotEmpty())
             }
@@ -120,48 +139,15 @@ class CateringItemTest {
 
     @Test
     @Transactional
-    fun `itemList is null for create, defaults to 100`() {
-        val cateringList = buildCateringList().copy(itemLimit = null)
+    fun `Error when type is null for create`() {
+        val cateringList = buildCateringItemNoType()
 
-        val result = cateringListService.create(cateringList)
-
-        when(result) {
+        when(val result = cateringItemService.create(cateringList)) {
             is OperationResult.Error -> {
-                fail()
+                assert(result.errors.isNotEmpty())
             }
             is OperationResult.Success -> {
-                assert(result.data!!.itemLimit == 100)
-            }
-        }
-    }
-
-    @Test
-    @Transactional
-    fun `maxUsers is null for create, defaults to 10`() {
-        val cateringList = buildCateringList().copy(maxUsers = null)
-
-        when(val result = cateringListService.create(cateringList)) {
-            is OperationResult.Error -> {
                 fail()
-            }
-            is OperationResult.Success -> {
-                assert(result.data!!.maxUsers == 10)
-            }
-        }
-    }
-
-    @Test
-    @Transactional
-    fun `sessionId is unique for create`() {
-        val cateringList = buildCateringList()
-
-        when(val result = cateringListService.create(cateringList)) {
-            is OperationResult.Error -> {
-                fail()
-            }
-            is OperationResult.Success -> {
-                assert(result.data != null)
-                assert(result.data!!.sessionId!!.length == 8)
             }
         }
     }

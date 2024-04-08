@@ -4,6 +4,8 @@ export default class CateringListHelpers {
     cateringListPath: '/v1/cateringlist/',
     cateringListUserPath: '/v1/cateringlist/user/',
     cateringListSessionPath: '/v1/cateringlist/session/',
+    cateringItemPath: '/v1/cateringitem/list/',
+
     cateringList() {
       return this.root + this.cateringListPath;
     },
@@ -15,6 +17,9 @@ export default class CateringListHelpers {
     },
     getCateringListBySessionId() {
       return this.root + this.cateringListSessionPath;
+    },
+    getCateringListById() {
+      return this.root + this.cateringItemPath;
     }
   };
 }

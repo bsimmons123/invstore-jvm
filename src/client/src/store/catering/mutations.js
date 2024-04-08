@@ -42,6 +42,7 @@ export default {
   FLIP_CREATE_LIST_OPTION(state) {
     state[StoreState.createListOption] = !state[StoreState.createListOption];
   },
+
   SET_LOADING_ITEM(state, payload) {
     state[StoreState.loadingItems] = payload;
   },

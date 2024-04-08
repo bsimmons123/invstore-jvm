@@ -71,7 +71,7 @@ class CateringListController(
     fun updateCateringList(@RequestBody cateringList: CateringListEditDTO, principal: Principal): ResponseEntity<ApiResponse<CateringListDTO?>> {
         log.info("PUT /api/v1/cateringlist/")
 
-        val result = cateringListService.update(cateringList.toCateringList(cateringListService))
+        val result = cateringListService.update(cateringList)
 
         return ServiceUtils.handleResult(result)
     }
