@@ -1,4 +1,6 @@
-import {createCateringListAdapter} from "@/store/catering/CreateCateringListAdapter";
+import {createCateringListAdapter} from "@/store/catering/services/CreateCateringListAdapter";
+import {createCateringItemTypeAdapter} from "@/store/catering/services/CreateCateringItemTypeAdapter";
+import {createCateringItemAdapter} from "@/store/catering/services/CreateCateringItemAdapter";
 
 export const StoreState = {
   list: 'list',
@@ -11,10 +13,17 @@ export const StoreState = {
   selList: 'selList',
   items: 'items',
   loadingItems: 'loadingLists',
-  createItemLoading: 'createListLoading',
-  createItemErrors: 'createErrors',
-  createItemAdapter: 'createListAdapter',
-  createItemOption: 'createListOption',
+  createItemLoading: 'createItemLoading',
+  createItemErrors: 'createItemErrors',
+  createItemAdapter: 'createItemAdapter',
+  createItemOption: 'createItemOption',
+
+  types: 'types',
+  loadingTypes: 'loadingTypes',
+  createTypeLoading: 'createTypeLoading',
+  createTypeErrors: 'createTypeErrors',
+  createTypeAdapter: 'createTypeAdapter',
+  createTypeOption: 'createTypeOption',
 };
 
 export default {
@@ -29,7 +38,14 @@ export default {
   loadingItems: false,
   createItemLoading: false,
   createItemErrors: [],
-  createItemAdapter: createCateringListAdapter(),
+  createItemAdapter: createCateringItemAdapter(),
   createItemOption: false,
-  selList: {}
+  selList: {},
+
+  types: [],
+  loadingTypes: false,
+  createTypeLoading: false,
+  createTypeErrors: [],
+  createTypeAdapter: createCateringItemTypeAdapter(),
+  createTypeOption: false,
 };

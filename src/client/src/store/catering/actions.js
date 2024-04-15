@@ -1,14 +1,17 @@
 import { StoreMutations } from './mutations';
 import useApi from "@/api/axios";
-import CateringListHelpers from "@/store/catering/helpers";
+import CateringListHelpers from "@/store/catering/services/helpers";
 import {StoreState} from "@/store/catering/state";
-import {createCateringListAdapter} from "@/store/catering/CreateCateringListAdapter";
+import {createCateringListAdapter} from "@/store/catering/services/CreateCateringListAdapter";
 
 export const StoreActions = {
   getLists: 'getLists',
   createList: 'createList',
   getList: 'getList',
-  getItems: 'getItems'
+  getItems: 'getItems',
+  createItem: 'createItem',
+  createType: 'createType',
+  getTypes: 'getTypes',
 };
 
 export default {
@@ -80,5 +83,64 @@ export default {
                     commit(StoreMutations.SET_LOADING_ITEM, false)
                 }
             );
-    }
+    },
+    createItem({ commit, state }, item) {
+        commit(StoreMutations.SET_CREATE_ITEM_LOADING, true)
+        const api = useApi();
+
+        console.log(item)
+        item.listId = state[StoreState.selList].id
+        item.status = item.status.value
+
+        api.post(`${CateringListHelpers.paths.createCateringItem()}`, item)
+            .then((res) => {
+                if (!res.data.success) {
+                    commit(StoreMutations.SET_CREATE_ITEM_ERRORS, res.data.errors)
+                } else {
+                    commit(StoreMutations.ADD_ITEM, res.data.value)
+                }
+                commit(StoreMutations.SET_CREATE_ITEM_LOADING, false)
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_CREATE_ITEM_LOADING, false)
+                }
+            );
+    },
+    createType({ commit, state }, type) {
+        commit(StoreMutations.SET_CREATE_TYPE_LOADING, true)
+        const api = useApi();
+
+        type.listId = state[StoreState.selList].id
+
+        api.post(`${CateringListHelpers.paths.createCateringItemType()}`, type)
+            .then((res) => {
+                if (!res.data.success) {
+                    commit(StoreMutations.SET_CREATE_TYPE_ERRORS, res.data.errors)
+                } else {
+                    commit(StoreMutations.ADD_TYPE, res.data.value)
+                }
+                commit(StoreMutations.SET_CREATE_TYPE_LOADING, false)
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_CREATE_TYPE_LOADING, false)
+                }
+            );
+    },
+    getTypes({ commit, state }) {
+        commit(StoreMutations.SET_LOADING_TYPE, true)
+        const api = useApi();
+
+        api.get(`${CateringListHelpers.paths.cateringItemType()}${state[StoreState.selList].id}`)
+            .then((res) => {
+                commit(StoreMutations.SET_TYPES, res.data.value)
+                commit(StoreMutations.SET_LOADING_TYPE, false)
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_LOADING_TYPE, false)
+                }
+            );
+    },
 };

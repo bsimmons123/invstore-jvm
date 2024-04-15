@@ -41,8 +41,7 @@ data class CateringItemTypeCreateDTO(
     var quantity: Int?,
     var status: CateringItem.Status?
 ) {
-    fun toCateringItemType(cateringItemRepo: CateringItemRepository, cateringListRepository: CateringListRepository): CateringItemType {
-        val item = cateringItemRepo.findById(this.id).get()
+    fun toCateringItemType(cateringListRepository: CateringListRepository): CateringItemType {
         val list = cateringListRepository.findById(listId ?: 0)
 
         if (list.isEmpty){
@@ -51,8 +50,8 @@ data class CateringItemTypeCreateDTO(
 
         return CateringItemType(
             id = this.id,
-            label = this.label ?: item.label,
-            description = this.description ?: item.description,
+            label = this.label,
+            description = this.description,
             list = list.get()
         )
     }

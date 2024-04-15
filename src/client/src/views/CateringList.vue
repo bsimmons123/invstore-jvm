@@ -1,6 +1,6 @@
 <script setup>
 import DefaultInfoCard from "@/examples/Cards/DefaultInfoCard.vue";
-import TransactionCard from "./components/TransactionCard.vue";
+import ItemTypeList from "./components/ItemTypeList.vue";
 import {useStore} from "vuex";
 import {computed, onMounted} from "vue";
 import {StoreState} from "@/store/catering/state";
@@ -10,6 +10,8 @@ import {useRoute} from "vue-router";
 import InviteList from "@/views/components/InviteList.vue";
 import ItemList from "@/views/components/ItemList.vue";
 import NotesSection from "@/views/components/NotesSection.vue";
+import AddCateringItem from "@/views/components/AddCateringItem.vue";
+import AddCateringItemType from "@/views/components/AddCateringItemType.vue";
 
 const store = useStore();
 const route = useRoute();
@@ -17,13 +19,25 @@ const route = useRoute();
 const cateringListState = store.state.cateringList;
 
 const list = computed(() => cateringListState[StoreState.selList]);
+const createItemErrors = computed(() => cateringListState[StoreState.createItemErrors]);
+const createItemLoading = computed(() => cateringListState[StoreState.createItemLoading]);
+const items = computed(() => cateringListState[StoreState.items]);
+const itemsLoading = computed(() => cateringListState[StoreState.loadingItems]);
+const types = computed(() => cateringListState[StoreState.types]);
+const typesLoading = computed(() => cateringListState[StoreState.loadingTypes]);
+const createItemTypeErrors = computed(() => cateringListState[StoreState.createTypeErrors]);
+const createItemTypeLoading = computed(() => cateringListState[StoreState.createTypeLoading]);
 
 const getList = (id) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getList}`, id);
 const getItems = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getItems}`);
+const getTypes = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getTypes}`);
+const createItem = (item) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.createItem}`, item)
+const createItemType = (item) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.createType}`, item)
 
 onMounted(() => {
   getList(route.params.sessionId).then(() => {
     getItems()
+    getTypes()
   })
 });
 </script>
@@ -82,10 +96,28 @@ onMounted(() => {
     </div>
     <div class="row">
       <div class="col-md-7">
-        <item-list />
+        <item-list
+          :items="items"
+          :loading="itemsLoading"
+          title="Items"
+        />
+        <add-catering-item
+          @create:submit-form="createItem"
+          :errors="createItemErrors"
+          :loading="createItemLoading"
+          :types="types"
+        />
       </div>
       <div class="col-md-5">
-        <transaction-card />
+        <item-type-list
+          :types="types"
+          :loading="typesLoading"
+        />
+        <add-catering-item-type
+            @create:submit-form="createItemType"
+            :errors="createItemTypeErrors"
+            :loading="createItemTypeLoading"
+        />
       </div>
     </div>
   </div>

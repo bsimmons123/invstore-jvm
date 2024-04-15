@@ -4,7 +4,7 @@ import DefaultInfoCard from "@/examples/Cards/DefaultInfoCard.vue";
 import PaymentCard from "./components/PaymentCard.vue";
 import InvoiceCard from "./components/InvoiceCard.vue";
 import BillingCard from "./components/BillingCard.vue";
-import TransactionCard from "./components/TransactionCard.vue";
+import TransactionCard from "./components/ItemTypeList.vue";
 </script>
 <template>
   <div class="container-fluid">

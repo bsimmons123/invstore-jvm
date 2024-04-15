@@ -1,10 +1,10 @@
 <script setup>
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonSwitch from "@/components/ArgonSwitch.vue";
-import {createCateringListAdapter} from "@/store/catering/CreateCateringListAdapter";
+import {createCateringListAdapter} from "@/store/catering/services/CreateCateringListAdapter";
 import ArgonButton from "@/components/ArgonButton.vue";
 import ArgonDropdown from "@/components/ArgonDropdown.vue";
-import {Visibility} from "@/store/catering/Visibility";
+import {Visibility} from "@/store/catering/services/Visibility";
 
 defineProps({
   title: {

@@ -23,7 +23,7 @@ class CateringItemTypeController(
     private val log = LoggerFactory.getLogger(CateringItemTypeController::class.java)
 
     @GetMapping("/{id}")
-    fun getCateringItem(@PathVariable id: Long, principal: Principal): ResponseEntity<ApiResponse<CateringItemTypeDTO?>> {
+    fun getCateringItem(@PathVariable id: Long): ResponseEntity<ApiResponse<CateringItemTypeDTO?>> {
         log.info("GET /api/v1/cateringitemtype/$id")
 
         val result = cateringItemTypeService.findById(id)
@@ -32,7 +32,7 @@ class CateringItemTypeController(
     }
 
     @GetMapping("/list/{id}")
-    fun getCateringItemBySessionId(@PathVariable id: Long, principal: Principal): ResponseEntity<ApiResponse<List<CateringItemTypeDTO>?>> {
+    fun getCateringItemBySessionId(@PathVariable id: Long): ResponseEntity<ApiResponse<List<CateringItemTypeDTO>?>> {
         log.info("GET /api/v1/cateringitemtype/list/$id")
 
         val result = cateringItemTypeService.findByListId(id)
@@ -41,7 +41,7 @@ class CateringItemTypeController(
     }
 
     @PostMapping("/")
-    fun createCateringItem(@RequestBody cateringItem: CateringItemTypeCreateDTO, principal: Principal): ResponseEntity<ApiResponse<CateringItemTypeDTO?>> {
+    fun createCateringItem(@RequestBody cateringItem: CateringItemTypeCreateDTO): ResponseEntity<ApiResponse<CateringItemTypeDTO?>> {
         log.info("POST /api/v1/cateringitemtype/")
 
         val result = cateringItemTypeService.create(cateringItem)
@@ -50,7 +50,7 @@ class CateringItemTypeController(
     }
 
     @PutMapping("/")
-    fun updateCateringItem(@RequestBody cateringItem: CateringItemTypeEditDTO, principal: Principal): ResponseEntity<ApiResponse<CateringItemTypeDTO?>> {
+    fun updateCateringItem(@RequestBody cateringItem: CateringItemTypeEditDTO): ResponseEntity<ApiResponse<CateringItemTypeDTO?>> {
         log.info("PUT /api/v1/cateringitemtype/")
 
         val result = cateringItemTypeService.update(cateringItem)

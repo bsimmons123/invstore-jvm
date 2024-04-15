@@ -1,5 +1,6 @@
 package com.invstore.invstorejvm.models.catering
 
+import com.invstore.invstorejvm.repositories.catering.CateringItemTypeRepository
 import com.invstore.invstorejvm.repositories.catering.CateringListRepository
 import com.invstore.invstorejvm.services.catering.CateringItemService
 import jakarta.persistence.*
@@ -43,7 +44,7 @@ data class CateringItem(
             listId = this.id,
             status = this.status,
             quantity = this.quantity,
-            type = this.type
+            type = this.type?.toDTO()
         )
     }
 }
@@ -78,25 +79,30 @@ data class CateringItemCreateDTO(
 data class CateringItemEditDTO(
     var id: Long,
     var label: String?,
-    var type: CateringItemType?,
-    var list: Long?,
+    var typeId: Long?,
+    var listId: Long?,
     var description: String?,
     var quantity: Int?,
     var status: CateringItem.Status?
 ) {
-    fun toCateringItem(cateringItemService: CateringItemService, cateringListRepository: CateringListRepository): CateringItem {
+    fun toCateringItem(cateringItemService: CateringItemService, cateringListRepository: CateringListRepository, cateringItemTypeRepository: CateringItemTypeRepository): CateringItem {
         val item = cateringItemService.findById(this.id).data!!
-        val list = cateringListRepository.findById(list ?: 0)
-        if (list.isEmpty) {
-            throw NoSuchElementException("Catering Item ${id} not found")
+        val listObj = cateringListRepository.findById(listId ?: 0)
+        val typeObj = cateringItemTypeRepository.findById(typeId ?: 0)
+        if (listObj.isEmpty) {
+            throw NoSuchElementException("Catering Item $listId not found")
+        }
+
+        if (typeObj.isEmpty) {
+            throw NoSuchElementException("Item Type $typeId not found")
         }
 
         return CateringItem(
             id = this.id,
             label = this.label ?: item.label,
-            type = this.type ?: item.type,
+            type = typeObj.get(),
             description = this.description ?: item.description,
-            list = list.get(),
+            list = listObj.get(),
             quantity = this.quantity ?: 1,
             status = this.status ?: item.status
         )
@@ -106,7 +112,7 @@ data class CateringItemEditDTO(
 data class CateringItemDTO(
     var id: Long,
     var label: String?,
-    var type: CateringItemType?,
+    var type: CateringItemTypeDTO?,
     var listId: Long,
     var description: String?,
     var quantity: Int?,

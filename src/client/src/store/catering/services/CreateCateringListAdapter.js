@@ -1,4 +1,4 @@
-import {Visibility} from "@/store/catering/Visibility";
+import {Visibility} from "@/store/catering/services/Visibility";
 
 export function createCateringListAdapter() {
     return {

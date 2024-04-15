@@ -25,7 +25,7 @@ class CateringItemTypeService(
 
     override fun create(cateringItem: CateringItemTypeCreateDTO): OperationResult<CateringItemTypeDTO?> {
         val errors = hashMapOf<String, String>()
-        val item = cateringItem.toCateringItemType(cateringItemRepo, cateringListRepo)
+        val item = cateringItem.toCateringItemType(cateringListRepo)
 
         // LABEL
         if (item.label?.isBlank() == true) {

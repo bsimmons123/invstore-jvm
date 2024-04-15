@@ -2,6 +2,7 @@ package com.invstore.invstorejvm.services.catering
 
 import com.invstore.invstorejvm.models.catering.*
 import com.invstore.invstorejvm.repositories.catering.CateringItemRepository
+import com.invstore.invstorejvm.repositories.catering.CateringItemTypeRepository
 import com.invstore.invstorejvm.repositories.catering.CateringListRepository
 import com.invstore.invstorejvm.services.OperationResult
 import org.springframework.stereotype.Service
@@ -9,7 +10,8 @@ import org.springframework.stereotype.Service
 @Service
 class CateringItemService(
     private val cateringItemRepository: CateringItemRepository,
-    private val cateringListRepo: CateringListRepository
+    private val cateringListRepo: CateringListRepository,
+    private val cateringItemTypeRepository: CateringItemTypeRepository
 ) : ICateringItemService {
 
     override fun findByListId(userId: Long): OperationResult<List<CateringItemDTO>?> {
@@ -66,11 +68,11 @@ class CateringItemService(
         }
 
         // USER
-        if ((cateringItem.list ?: 0) <= 0) {
+        if ((cateringItem.listId ?: 0) <= 0) {
             errors["List"] = "Invalid List"
         }
 
-        if ((cateringItem.type?.id ?: 0) > 0) {
+        if ((cateringItem.typeId ?: 0) > 0) {
             errors["TypeId"] = "Type cannot be blank"
         }
 
@@ -78,7 +80,7 @@ class CateringItemService(
         if (errors.isNotEmpty()) {
             return OperationResult.Error(errors)
         } else {
-            val result = cateringItemRepository.save(cateringItem.toCateringItem(this, cateringListRepo))
+            val result = cateringItemRepository.save(cateringItem.toCateringItem(this, cateringListRepo, cateringItemTypeRepository))
             return OperationResult.Success(result.toCateringItemDTO())
         }
     }
