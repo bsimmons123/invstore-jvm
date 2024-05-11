@@ -1,4 +1,6 @@
 <script setup>
+import EditCateringList from "@/views/components/EditCateringList.vue";
+
 defineProps({
   title: {
     type: String,
@@ -92,7 +94,10 @@ const emit = defineEmits(['show:creatList'])
               <a href="javascript:;"
                  class="text-secondary font-weight-bold text-xs"
                  data-toggle="tooltip"
-                 data-original-title="Edit list">
+                 data-original-title="Edit list"
+                 data-bs-toggle="modal"
+                 data-bs-target="#editCateringList"
+              >
                 Edit
               </a>
             </td>
@@ -111,5 +116,8 @@ const emit = defineEmits(['show:creatList'])
         </table>
       </div>
     </div>
+    <edit-catering-list
+
+    />
   </div>
 </template>

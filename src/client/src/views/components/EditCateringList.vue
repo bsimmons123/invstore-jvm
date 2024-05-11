@@ -7,7 +7,7 @@ import ArgonDropdown from "@/components/ArgonDropdown.vue";
 const props = defineProps({
   title: {
     type: String,
-    default: "Add Item",
+    default: "Update list",
   },
   loading: {
     type: Boolean,
@@ -38,7 +38,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="modal fade" id="addCateringItemModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal fade" id="editCateringList" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
