@@ -1,10 +1,14 @@
 <script setup>
-import { computed, ref } from "vue";
+import {computed, onMounted, ref} from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import Breadcrumbs from "../Breadcrumbs.vue";
 import StoreIndex from "@/store/login/_StoreIndex";
+import CateringStoreIndex from "@/store/catering/_StoreIndex";
+import ProfileStoreIndex from "@/store/profile/_StoreIndex";
 import {StoreActions} from "@/store/login/actions";
+import {StoreActions as CateringStoreActions} from "@/store/catering/actions";
+import {StoreActions as ProfileStoreActions} from "@/store/profile/actions";
 
 const showMenu = ref(false);
 const store = useStore();
@@ -12,10 +16,16 @@ const store = useStore();
 const route = useRoute();
 
 const loginState = store.state.userLogin;
+const profile = store.state.profile;
+const cateringList = store.state.cateringList;
 
 const loggedIn = computed(() => loginState.isLoggedIn);
+const user = computed(() => profile.user)
+const invites = computed(() => cateringList.userInvites)
 
 const logout = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.logout}`);
+const getUserProfile = () => store.dispatch(`${ProfileStoreIndex.storeName}/${ProfileStoreActions.getUser}`);
+const getInvitesForUser = (userEmail) => store.dispatch(`${CateringStoreIndex.storeName}/${CateringStoreActions.getInvitesForUser}`, userEmail)
 
 const currentRouteName = computed(() => {
   return route.name;
@@ -33,6 +43,13 @@ const closeMenu = () => {
     showMenu.value = false;
   }, 100);
 };
+
+onMounted(() => {
+  getUserProfile().then(() => {
+    console.log(user.value)
+    getInvitesForUser(user.value.email)
+  })
+});
 </script>
 <template>
   <nav
@@ -124,7 +141,7 @@ const closeMenu = () => {
               :class="showMenu ? 'show' : ''"
               aria-labelledby="dropdownMenuButton"
             >
-              <li class="mb-2">
+              <li class="mb-2" v-for="inv in invites" :key="inv.id">
                 <a class="dropdown-item border-radius-md" href="javascript:;">
                   <div class="py-1 d-flex">
                     <div class="my-auto">
@@ -136,90 +153,12 @@ const closeMenu = () => {
                     </div>
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-1 text-sm font-weight-normal">
-                        <span class="font-weight-bold">New message</span> from
-                        Laur
+                        <span class="font-weight-bold">New invite</span> from
+                        {{ inv.whoInvited.username }}
                       </h6>
                       <p class="mb-0 text-xs text-secondary">
                         <i class="fa fa-clock me-1"></i>
-                        13 minutes ago
-                      </p>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li class="mb-2">
-                <a class="dropdown-item border-radius-md" href="javascript:;">
-                  <div class="py-1 d-flex">
-                    <div class="my-auto">
-                      <img
-                        src="../../assets/img/small-logos/logo-spotify.svg"
-                        class="avatar avatar-sm bg-gradient-dark me-3"
-                        alt="logo spotify"
-                      />
-                    </div>
-                    <div class="d-flex flex-column justify-content-center">
-                      <h6 class="mb-1 text-sm font-weight-normal">
-                        <span class="font-weight-bold">New album</span> by
-                        Travis Scott
-                      </h6>
-                      <p class="mb-0 text-xs text-secondary">
-                        <i class="fa fa-clock me-1"></i>
-                        1 day
-                      </p>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item border-radius-md" href="javascript:;">
-                  <div class="py-1 d-flex">
-                    <div
-                      class="my-auto avatar avatar-sm bg-gradient-secondary me-3"
-                    >
-                      <svg
-                        width="12px"
-                        height="12px"
-                        viewBox="0 0 43 36"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                      >
-                        <title>credit-card</title>
-                        <g
-                          stroke="none"
-                          stroke-width="1"
-                          fill="none"
-                          fill-rule="evenodd"
-                        >
-                          <g
-                            transform="translate(-2169.000000, -745.000000)"
-                            fill="#FFFFFF"
-                            fill-rule="nonzero"
-                          >
-                            <g transform="translate(1716.000000, 291.000000)">
-                              <g transform="translate(453.000000, 454.000000)">
-                                <path
-                                  class="color-background"
-                                  d="M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z"
-                                  opacity="0.593633743"
-                                />
-                                <path
-                                  class="color-background"
-                                  d="M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z"
-                                />
-                              </g>
-                            </g>
-                          </g>
-                        </g>
-                      </svg>
-                    </div>
-                    <div class="d-flex flex-column justify-content-center">
-                      <h6 class="mb-1 text-sm font-weight-normal">
-                        Payment successfully completed
-                      </h6>
-                      <p class="mb-0 text-xs text-secondary">
-                        <i class="fa fa-clock me-1"></i>
-                        2 days
+                        to {{ inv.relatedList.label }}
                       </p>
                     </div>
                   </div>

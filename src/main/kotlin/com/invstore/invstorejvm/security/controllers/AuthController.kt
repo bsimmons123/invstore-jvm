@@ -10,6 +10,7 @@ import com.invstore.invstorejvm.services.user.IUserService
 import com.invstore.invstorejvm.services.user.UserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.context.annotation.Profile
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -24,6 +25,7 @@ import java.time.LocalDateTime
 @RestController
 @CrossOrigin(origins = ["http://localhost:8082"])
 @RequestMapping("/api/v1/auth")
+@Profile("dev", "prod")
 class AuthController(
     private val userService: UserService,
     private val passwordEncoder: PasswordEncoder,

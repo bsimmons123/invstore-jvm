@@ -26,6 +26,14 @@ export const StoreState = {
   createTypeErrors: 'createTypeErrors',
   createTypeAdapter: 'createTypeAdapter',
   createTypeOption: 'createTypeOption',
+
+  invites: 'invites',
+  invitesLoading: 'invitesLoading',
+  createInviteErrors: 'createInviteErrors',
+  createInviteLoading: 'createInviteLoading',
+
+  userInvites: 'userInvites',
+  userInvitesLoading: 'userInvitesLoading',
 };
 
 export default {
@@ -50,4 +58,12 @@ export default {
   createTypeErrors: [],
   createTypeAdapter: createCateringItemTypeAdapter(),
   createTypeOption: false,
+
+  invites: [],
+  invitesLoading: false,
+  createInviteErrors: [],
+  createInviteLoading: false,
+
+  userInvites: [],
+  userInvitesLoading: false
 };

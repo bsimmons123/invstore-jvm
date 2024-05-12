@@ -1,4 +1,4 @@
-package com.invstore.invstorejvm.security
+package com.invstore.invstorejvm.config
 
 import com.invstore.invstorejvm.security.jwt.AuthEntryPointJwt
 import com.invstore.invstorejvm.security.jwt.AuthTokenFilter
@@ -18,7 +18,8 @@ import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configurers.*
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -35,8 +36,8 @@ import java.util.*
 
 @Configuration
 @EnableMethodSecurity
-@Profile("dev", "prod")
-class WebSecurityConfig {
+@Profile("test")
+class FakeSecurityConfig {
     @Autowired
     var userDetailsService: UserDetailsServiceImpl? = null
 
@@ -50,8 +51,8 @@ class WebSecurityConfig {
     private val authenticationSuccessHandler: OAuth2AuthenticationSuccessHandler? = null
 
     @Bean
-    fun authenticationJwtTokenFilter(): AuthTokenFilter {
-        return AuthTokenFilter()
+    fun authenticationJwtTokenFilter(): FakeAuthTokenFilter {
+        return FakeAuthTokenFilter()
     }
 
     @Bean
@@ -98,40 +99,19 @@ class WebSecurityConfig {
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.exceptionHandling { exception: ExceptionHandlingConfigurer<HttpSecurity?> ->
-                exception.authenticationEntryPoint(
-                    unauthorizedHandler
-                )
-            }
+            exception.authenticationEntryPoint(
+                unauthorizedHandler
+            )
+        }
             .sessionManagement { session: SessionManagementConfigurer<HttpSecurity?> ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers("/api/v1/auth/**", "/api/v1/auth/session/oauth/callback/").permitAll()
-                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                    .requestMatchers("/", "/static/**", "/favicon.png", "/index.html").permitAll()
-                    .requestMatchers("/login/oauth2/code/google", "/login/oauth2/code/github").permitAll()
-                    .anyRequest().authenticated()
+                    auth.anyRequest().permitAll()
             }
             .csrf{c -> c
                 .disable() // disable for now
-//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//                .csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
-//                .csrfTokenRepository(csrfTokenRepository())
             }
-            .oauth2Login { oauth: OAuth2LoginConfigurer<HttpSecurity?> ->
-                oauth.loginPage("/#/signin?checkLogin=true").permitAll()
-                oauth.defaultSuccessUrl("/api/v1/auth/session/oauth/callback").permitAll()
-                oauth.failureUrl("/#/signup?checklogin=true").permitAll()
-                oauth.userInfoEndpoint {
-                    it.userService(oauthUserService(userService!!, userDetailsService!!))
-                }
-                oauth.successHandler(authenticationSuccessHandler)
-            } // OpenID Connect with GitHub
-
-
-        http.authenticationProvider(authenticationProvider())
-
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }

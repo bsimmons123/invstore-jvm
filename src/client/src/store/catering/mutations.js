@@ -29,6 +29,15 @@ export const StoreMutations = {
   SET_CREATE_TYPE_ERRORS: 'SET_CREATE_TYPE_ERRORS',
   SET_CREATE_TYPE_ADAPTER: 'SET_CREATE_TYPE_ADAPTER',
   UPDATE_CREATE_TYPE_ADAPTER: 'UPDATE_CREATE_TYPE_ADAPTER',
+
+  SET_CREATE_INVITE_LOADING: 'SET_CREATE_INVITE_LOADING',
+  SET_CREATE_INVITE_ERRORS: 'SET_CREATE_INVITE_ERRORS',
+  ADD_INVITE: 'ADD_INVITE',
+  SET_INVITES: 'SET_INVITES',
+  SET_LOADING_INVITES: 'SET_LOADING_INVITES',
+
+  SET_USER_INVITES: 'SET_USER_INVITES',
+  SET_USER_LOADING_INVITES: 'SET_USER_LOADING_INVITES'
 };
 
 export default {
@@ -113,4 +122,27 @@ export default {
   ADD_TYPE(state, payload) {
     state[StoreState.types].push(payload)
   },
+
+  SET_CREATE_INVITE_LOADING(state, payload) {
+    state[StoreState.createInviteLoading] = payload
+  },
+  SET_CREATE_INVITE_ERRORS(state, payload) {
+    state[StoreState.createInviteErrors] = payload
+  },
+  ADD_INVITE(state, payload) {
+    state[StoreState.invites].push(payload)
+  },
+  SET_INVITES(state, payload) {
+    state[StoreState.invites] = payload
+  },
+  SET_LOADING_INVITES(state, payload) {
+    state[StoreState.invitesLoading] = payload
+  },
+
+  SET_USER_INVITES(state, payload) {
+    state[StoreState.userInvites] = payload
+  },
+  SET_USER_LOADING_INVITES(state, payload) {
+    state[StoreState.userInvitesLoading] = payload
+  }
 };

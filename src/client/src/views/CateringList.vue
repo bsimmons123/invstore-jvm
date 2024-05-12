@@ -27,17 +27,21 @@ const types = computed(() => cateringListState[StoreState.types]);
 const typesLoading = computed(() => cateringListState[StoreState.loadingTypes]);
 const createItemTypeErrors = computed(() => cateringListState[StoreState.createTypeErrors]);
 const createItemTypeLoading = computed(() => cateringListState[StoreState.createTypeLoading]);
+const invites = computed(() => cateringListState[StoreState.invites])
+const invitesLoading = computed(() => cateringListState[StoreState.invitesLoading])
 
 const getList = (id) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getList}`, id);
 const getItems = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getItems}`);
 const getTypes = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getTypes}`);
 const createItem = (item) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.createItem}`, item)
 const createItemType = (item) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.createType}`, item)
+const getInvites = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getInvites}`)
 
 onMounted(() => {
   getList(route.params.sessionId).then(() => {
     getItems()
     getTypes()
+    getInvites()
   })
 });
 </script>
@@ -91,7 +95,10 @@ onMounted(() => {
         </div>
       </div>
       <div class="col-lg-4">
-        <invite-list class="mt-4" />
+        <invite-list class="mt-4"
+          :invites="invites"
+          :loading="invitesLoading"
+        />
       </div>
     </div>
     <div class="row">
