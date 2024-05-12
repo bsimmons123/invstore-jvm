@@ -9,6 +9,8 @@ export const StoreState = {
   createErrors: 'createErrors',
   createListAdapter: 'createListAdapter',
   createListOption: 'createListOption',
+  loadingUpdateList: 'loadingUpdateList',
+  updateErrors: 'updateErrors',
 
   selList: 'selList',
   items: 'items',

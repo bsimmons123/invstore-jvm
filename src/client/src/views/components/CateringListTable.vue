@@ -1,5 +1,9 @@
 <script setup>
 import EditCateringList from "@/views/components/EditCateringList.vue";
+import {ref} from "vue";
+import StoreIndex from "@/store/catering/_StoreIndex";
+import {StoreActions} from "@/store/catering/actions";
+import {useStore} from "vuex";
 
 defineProps({
   title: {
@@ -23,6 +27,18 @@ defineProps({
     default: false,
   },
 });
+
+const selList = ref()
+const selListIndex = ref()
+
+const store = useStore();
+
+const toggleEdit = function(list, index) {
+  selList.value = list;
+  selListIndex.value = index;
+}
+
+const updateList = (list) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.updateList}`, list)
 
 const emit = defineEmits(['show:creatList'])
 </script>
@@ -97,6 +113,7 @@ const emit = defineEmits(['show:creatList'])
                  data-original-title="Edit list"
                  data-bs-toggle="modal"
                  data-bs-target="#editCateringList"
+                 @click="toggleEdit(value, index)"
               >
                 Edit
               </a>
@@ -117,7 +134,9 @@ const emit = defineEmits(['show:creatList'])
       </div>
     </div>
     <edit-catering-list
-
+      :model="selList"
+      :model-index="selListIndex"
+      @update:submit-form="updateList"
     />
   </div>
 </template>

@@ -8,6 +8,9 @@ export const StoreMutations = {
   SET_CREATE_LIST_ADAPTER: 'SET_CREATE_LIST_ADAPTER',
   UPDATE_CREATE_LIST_ADAPTER: 'UPDATE_CREATE_LIST_ADAPTER',
   FLIP_CREATE_LIST_OPTION: 'FLIP_CREATE_LIST_OPTION',
+  SET_UPDATE_LIST_LOADING: 'SET_UPDATE_LIST_LOADING',
+  SET_UPDATE_ERRORS: 'SET_UPDATE_ERRORS',
+  UPDATE_LIST: 'UPDATE_LIST',
 
   SET_ITEMS: 'SET_ITEMS',
   ADD_ITEM: 'ADD_ITEM',
@@ -78,6 +81,15 @@ export default {
   },
   SET_SEL_LIST(state, payload) {
     state[StoreState.selList] = payload;
+  },
+  SET_UPDATE_LIST_LOADING(state, payload) {
+    state[StoreState.loadingUpdateList] = payload
+  },
+  SET_UPDATE_ERRORS(state, payload) {
+    state[StoreState.updateErrors] = payload
+  },
+  UPDATE_LIST(state, payload) {
+    state[StoreState.list][payload.index] = payload.list;
   },
 
   SET_LOADING_TYPE(state, payload) {

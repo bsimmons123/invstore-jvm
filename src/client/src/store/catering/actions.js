@@ -12,6 +12,7 @@ export const StoreActions = {
   createItem: 'createItem',
   createType: 'createType',
   getTypes: 'getTypes',
+  updateList: 'updateList'
 };
 
 export default {
@@ -140,6 +141,27 @@ export default {
             .catch((error) => {
                     console.log(error)
                     commit(StoreMutations.SET_LOADING_TYPE, false)
+                }
+            );
+    },
+    updateList({ commit, state }, payload) {
+        commit(StoreMutations.SET_UPDATE_LIST_LOADING, true)
+        const api = useApi();
+        commit(StoreMutations.SET_CREATE_ERRORS, {})
+        api.put(`${CateringListHelpers.paths.createCateringList()}`, payload.list)
+            .then((res) => {
+                commit(StoreMutations.SET_UPDATE_LIST_LOADING, false)
+                if (!res.data.success) {
+                    commit(StoreMutations.SET_UPDATE_ERRORS, res.data.errors)
+                } else {
+                    const newList = [...state[StoreState.list] ]
+                    newList.push(res.data.value)
+                    commit(StoreMutations.UPDATE_LIST, newList);
+                }
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_UPDATE_LIST_LOADING, false)
                 }
             );
     },

@@ -1,13 +1,19 @@
 <script setup>
-import {createCateringItemAdapter} from "@/store/catering/services/CreateCateringItemAdapter";
 import ArgonInput from "@/components/ArgonInput.vue";
 import {ref, watchEffect} from "vue";
-import ArgonDropdown from "@/components/ArgonDropdown.vue";
+import {createCateringListAdapter} from "@/store/catering/services/CreateCateringListAdapter";
 
 const props = defineProps({
   title: {
     type: String,
     default: "Update list",
+  },
+  model: {
+    type: Object,
+    default: () => ({})
+  },
+  modelIndex: {
+    type: Number
   },
   loading: {
     type: Boolean,
@@ -17,22 +23,18 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
-  types: {
-    type: Array,
-    default: () => ([])
-  }
 });
 
-const item = ref(createCateringItemAdapter(props.types[0]))
-const emit = defineEmits(['create:submitForm'])
+const list = ref(createCateringListAdapter())
+const emit = defineEmits(['update:submitForm'])
 
 function updateValue(value, payload) {
-  item.value[value] = payload
+  list.value[value] = payload
 }
 
 watchEffect(() => {
-  if (props.types) {
-    item.value.type = props.types[0];
+  if (props.model) {
+    list.value = props.model;
   }
 });
 </script>
@@ -51,7 +53,7 @@ watchEffect(() => {
               <label for="label" class="form-control-label">Label</label>
               <argon-input
                   type="text"
-                  :model-value="item.label"
+                  :model-value="list.label"
                   @update:model-value="value => updateValue('label', value)"
               />
               <p class="error-message">{{ errors.Label }}</p>
@@ -63,33 +65,10 @@ watchEffect(() => {
                 >
                 <argon-input
                     type="text"
-                    :model-value="item.description"
+                    :model-value="list.description"
                     @update:model-value="value => updateValue('description', value)"
                 />
                 <p class="error-message">{{ errors.Description }}</p>
-              </div>
-              <div class="col-md-2">
-                <label for="example-text-input" class="form-control-label"
-                >Quantity</label
-                >
-                <argon-input
-                    type="number"
-                    :model-value="item.quantity"
-                    @update:model-value="value => updateValue('quantity', value)"
-                />
-                <p class="error-message">{{ errors.Quantity }}</p>
-              </div>
-              <div class="col-md-4">
-                <label for="example-text-input" class="form-control-label"
-                >Type</label
-                >
-                <argon-dropdown
-                    type="dropdown"
-                    :model-value="item.type"
-                    :dropdown-items="types"
-                    @update:model-value="value => updateValue('type', value)"
-                />
-                <p class="error-message">{{ errors.TypeId }}</p>
               </div>
             </div>
             <div class="modal-footer">
@@ -97,7 +76,7 @@ watchEffect(() => {
               <button
                   type="submit"
                   class="btn btn-primary"
-                  @click="emit('create:submitForm', item)"
+                  @click="emit('update:submitForm', {list: list, index: modelIndex})"
                   :class="loading ? 'disabled' : ''"
               >Submit</button>
             </div>
