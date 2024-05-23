@@ -1,6 +1,8 @@
 package com.invstore.invstorejvm.services.catering
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.invstore.invstorejvm.factories.ImageGenerator
+import com.invstore.invstorejvm.factories.Path
 import com.invstore.invstorejvm.models.catering.CateringList
 import com.invstore.invstorejvm.models.catering.CateringListCreateDTO
 import com.invstore.invstorejvm.models.catering.CateringListDTO
@@ -78,6 +80,9 @@ class CateringListService(
             return OperationResult.Error(errors)
         } else {
             val result = cateringListRepository.save(list).toCateringListDTO()
+
+            ImageGenerator().generateImage(result.id.toString(), result.label!!, result.label, Path.LIST, "listIcon")
+
             return OperationResult.Success(result)
         }
     }

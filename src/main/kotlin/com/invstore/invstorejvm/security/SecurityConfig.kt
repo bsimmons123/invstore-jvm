@@ -108,7 +108,7 @@ class WebSecurityConfig {
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers("/api/v1/auth/**", "/api/v1/auth/session/oauth/callback/").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                    .requestMatchers("/", "/static/**", "/favicon.png", "/index.html").permitAll()
+                    .requestMatchers("/", "/static/**", "/favicon.png", "/index.html", "/api/v1/image/**").permitAll()
                     .requestMatchers("/login/oauth2/code/google", "/login/oauth2/code/github").permitAll()
                     .anyRequest().authenticated()
             }
