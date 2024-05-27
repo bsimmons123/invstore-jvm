@@ -68,7 +68,6 @@ node {
 
 task("install") {
     dependsOn("buildFrontend")
-    dependsOn("bootRun")
 }
 
 task("buildFrontend", type = NpmTask::class) {

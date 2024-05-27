@@ -1,5 +1,7 @@
 package com.invstore.invstorejvm.services.user
 
+import com.invstore.invstorejvm.factories.ImageGenerator
+import com.invstore.invstorejvm.factories.Path
 import com.invstore.invstorejvm.models.users.User
 import com.invstore.invstorejvm.models.users.UserDTO
 import com.invstore.invstorejvm.repositories.users.UserRepository
@@ -50,7 +52,11 @@ class UserService(private var repository: UserRepository) : IUserService {
         // Update the 'updatedAt' value
         user.updatedAt = LocalDateTime.now()
 
-        return repository.save(user)
+        val u = repository.save(user)
+
+        ImageGenerator().generateImage(u.id.toString(), user.name, user.email, Path.USER, "userAvatar")
+
+        return u
     }
 
     override fun update(user: User): User? {
