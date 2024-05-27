@@ -12,6 +12,10 @@ export const StoreActions = {
   createItem: 'createItem',
   createType: 'createType',
   getTypes: 'getTypes',
+  updateList: 'updateList',
+  createInvite: 'createInvite',
+  getInvites: 'getInvites',
+  getInvitesForUser: 'getInvitesForUser'
 };
 
 export default {
@@ -143,4 +147,77 @@ export default {
                 }
             );
     },
+    updateList({ commit, state }, payload) {
+        commit(StoreMutations.SET_UPDATE_LIST_LOADING, true)
+        const api = useApi();
+        commit(StoreMutations.SET_CREATE_ERRORS, {})
+        api.put(`${CateringListHelpers.paths.createCateringList()}`, payload.list)
+            .then((res) => {
+                commit(StoreMutations.SET_UPDATE_LIST_LOADING, false)
+                if (!res.data.success) {
+                    commit(StoreMutations.SET_UPDATE_ERRORS, res.data.errors)
+                } else {
+                    const newList = [...state[StoreState.list] ]
+                    newList.push(res.data.value)
+                    commit(StoreMutations.UPDATE_LIST, newList);
+                }
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_UPDATE_LIST_LOADING, false)
+                }
+            );
+    },
+    createInvite({ commit, state }, payload) {
+        commit(StoreMutations.SET_CREATE_INVITE_LOADING, true)
+
+        payload.relatedList = state[StoreState.selList].id
+
+        const api = useApi();
+        commit(StoreMutations.SET_CREATE_INVITE_ERRORS, {})
+        api.post(`${CateringListHelpers.paths.cateringInviteCreate()}`, payload)
+            .then((res) => {
+                commit(StoreMutations.SET_CREATE_INVITE_LOADING, false)
+                if (!res.data.success) {
+                    commit(StoreMutations.SET_CREATE_INVITE_ERRORS, res.data.errors)
+                } else {
+                    commit(StoreMutations.ADD_INVITE, res.data.value);
+                }
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_CREATE_INVITE_LOADING, false)
+                }
+            );
+    },
+    getInvites({ commit, state }) {
+        commit(StoreMutations.SET_LOADING_INVITES, true)
+        const api = useApi();
+
+        api.get(`${CateringListHelpers.paths.cateringInviteListId()}${state[StoreState.selList].id}`)
+            .then((res) => {
+                commit(StoreMutations.SET_INVITES, res.data.value)
+                commit(StoreMutations.SET_LOADING_INVITES, false)
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_LOADING_INVITES, false)
+                }
+            );
+    },
+    getInvitesForUser({ commit }, userEmail) {
+        commit(StoreMutations.SET_USER_LOADING_INVITES, true)
+        const api = useApi();
+
+        api.get(`${CateringListHelpers.paths.cateringInviteListRec()}${userEmail}`)
+            .then((res) => {
+                commit(StoreMutations.SET_USER_INVITES, res.data.value)
+                commit(StoreMutations.SET_USER_LOADING_INVITES, false)
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_USER_LOADING_INVITES, false)
+                }
+            );
+    }
 };

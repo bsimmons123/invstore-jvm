@@ -82,7 +82,22 @@ data class CateringListDTO(
 
     val visibility: CateringList.Visibility,
     val notes: String?
-)
+) {
+    fun toCateringList(): CateringList {
+        return CateringList(
+            id = this.id,
+            description = this.description,
+            label = this.label,
+            isActive = this.isActive,
+            itemLimit = this.itemLimit,
+            location = this.location,
+            maxUsers = this.maxUsers,
+            sessionId = null, // this will be set in the service layer
+            user = this.user.toUser(),
+            notes = this.notes
+        )
+    }
+}
 
 data class CateringListCreateDTO(
     val label: String?,

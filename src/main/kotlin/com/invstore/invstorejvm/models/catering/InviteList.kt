@@ -1,6 +1,8 @@
 package com.invstore.invstorejvm.models.catering
 
 import com.invstore.invstorejvm.models.users.User
+import com.invstore.invstorejvm.models.users.UserDTO
+import com.invstore.invstorejvm.repositories.catering.CateringListRepository
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -23,4 +25,42 @@ data class InviteList(
 
     @Column(name = "date_sent")
     var dateSent: LocalDateTime = LocalDateTime.now()
+) {
+    fun toInviteListDTO(): InviteListDTO {
+        return InviteListDTO(
+            id = this.id,
+            userEmail = this.userEmail,
+            whoInvited = this.whoInvited.toUserDTO(),
+            relatedList = this.relatedList.toCateringListDTO(),
+            accepted = this.accepted,
+            dateSent = this.dateSent
+        )
+    }
+}
+
+data class InviteListDTO(
+    val id: Long,
+    val userEmail: String,
+    val whoInvited: UserDTO,
+    val relatedList: CateringListDTO,
+    val accepted: Boolean,
+    val dateSent: LocalDateTime
 )
+
+data class InviteListCreateDTO(
+    var id: Long?,
+    var userEmail: String?,
+    var whoInvited: UserDTO?,
+    var relatedList: Long?,
+) {
+    fun toInviteList(cateringListRepository: CateringListRepository): InviteList {
+        val list = cateringListRepository.findById(relatedList ?: 0)
+        return InviteList(
+            id = 0,
+            userEmail = this.userEmail!!,
+            whoInvited = this.whoInvited!!.toUser(),
+            relatedList = list.get(),
+            accepted = false,
+        )
+    }
+}
