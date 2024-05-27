@@ -11,7 +11,7 @@ export default {
         commit(StoreMutations.SET_LOADING_USER, true)
         const api = useApi();
 
-        api.get(ProfileHelpers.paths.user())
+        return api.get(ProfileHelpers.paths.user())
           .then((res) => {
               commit(StoreMutations.SET_USER, res.data.value)
               commit(StoreMutations.SET_LOADING_USER, false)

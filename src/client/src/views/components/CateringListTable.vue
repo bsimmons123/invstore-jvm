@@ -1,4 +1,10 @@
 <script setup>
+import EditCateringList from "@/views/components/EditCateringList.vue";
+import {ref} from "vue";
+import StoreIndex from "@/store/catering/_StoreIndex";
+import {StoreActions} from "@/store/catering/actions";
+import {useStore} from "vuex";
+
 defineProps({
   title: {
     type: String,
@@ -21,6 +27,18 @@ defineProps({
     default: false,
   },
 });
+
+const selList = ref()
+const selListIndex = ref()
+
+const store = useStore();
+
+const toggleEdit = function(list, index) {
+  selList.value = list;
+  selListIndex.value = index;
+}
+
+const updateList = (list) => store.dispatch(`${StoreIndex.storeName}/${StoreActions.updateList}`, list)
 
 const emit = defineEmits(['show:creatList'])
 </script>
@@ -70,7 +88,7 @@ const emit = defineEmits(['show:creatList'])
             <td>
               <div class="d-flex px-2 py-1">
                 <div>
-                  <img src="../../assets/img/team-3.jpg" class="avatar avatar-sm me-3" alt="user2" />
+                  <img :src="`/api/v1/image/list/${value.id}`" class="avatar avatar-sm me-3" alt="user2" />
                 </div>
                 <div class="d-flex flex-column justify-content-center">
                   <h6 class="mb-0 text-sm">{{ value.label }}</h6>
@@ -92,7 +110,11 @@ const emit = defineEmits(['show:creatList'])
               <a href="javascript:;"
                  class="text-secondary font-weight-bold text-xs"
                  data-toggle="tooltip"
-                 data-original-title="Edit list">
+                 data-original-title="Edit list"
+                 data-bs-toggle="modal"
+                 data-bs-target="#editCateringList"
+                 @click="toggleEdit(value, index)"
+              >
                 Edit
               </a>
             </td>
@@ -111,5 +133,10 @@ const emit = defineEmits(['show:creatList'])
         </table>
       </div>
     </div>
+    <edit-catering-list
+      :model="selList"
+      :model-index="selListIndex"
+      @update:submit-form="updateList"
+    />
   </div>
 </template>
