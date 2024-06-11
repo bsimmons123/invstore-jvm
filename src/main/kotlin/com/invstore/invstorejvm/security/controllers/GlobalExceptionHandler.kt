@@ -39,6 +39,16 @@ class GlobalExceptionHandler {
         return ResponseEntity(errorDetails, HttpStatus.NOT_FOUND)
     }
 
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException::class)  // This can be any exception you want to handle
+    fun handleBadCredentials(ex: ChangeSetPersister.NotFoundException): ResponseEntity<Any> {
+        val errorDetails = ErrorDetails(
+            status = HttpStatus.FORBIDDEN.value(),
+            message = "Invalid Login",
+            details = ex.message
+        )
+        return ResponseEntity(errorDetails, HttpStatus.NOT_FOUND)
+    }
+
     // Handle general exceptions
     @ExceptionHandler(Exception::class)
     fun handleAllUncaughtException(ex: Exception): ResponseEntity<Any> {
