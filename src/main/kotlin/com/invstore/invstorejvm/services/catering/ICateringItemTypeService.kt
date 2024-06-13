@@ -9,4 +9,5 @@ interface ICateringItemTypeService {
     fun update(cateringItem: CateringItemTypeEditDTO): OperationResult<CateringItemTypeDTO?>
     fun delete(cateringItem: CateringItemType)
     fun findById(id: Long): OperationResult.Success<CateringItemTypeDTO?>
+    fun findByUserId(userId: Long): OperationResult<List<CateringItemTypeDTO?>>
 }

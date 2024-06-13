@@ -8,6 +8,7 @@ import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
 import RouterList from "@/store/global-helpers/routerList";
 import CateringList from "@/views/CateringList.vue";
+import CateringListNotFound from "@/views/components/CateringListNotFound.vue";
 
 const routes = [
   {
@@ -42,6 +43,15 @@ const routes = [
     name: "CateringList",
     value: "CateringList",
     component: CateringList,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/cateringlist-not-found",
+    name: "CateringListNotFound",
+    value: "CateringListNotFound",
+    component: CateringListNotFound,
     meta: {
       requiresAuth: true
     }

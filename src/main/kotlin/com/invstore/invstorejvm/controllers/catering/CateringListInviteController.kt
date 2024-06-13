@@ -2,6 +2,7 @@ package com.invstore.invstorejvm.controllers.catering
 
 import com.invstore.invstorejvm.ApiResponse
 import com.invstore.invstorejvm.models.catering.*
+import com.invstore.invstorejvm.security.requests.SignInRequest
 import com.invstore.invstorejvm.services.OperationResult
 import com.invstore.invstorejvm.services.ServiceUtils
 import com.invstore.invstorejvm.services.catering.CateringListInviteService
@@ -50,13 +51,42 @@ class CateringListInviteController(
         return ServiceUtils.handleResult(result)
     }
 
-    @GetMapping("/received/{email}")
-    fun getInviteByReceivedEmail(@PathVariable email: String, principal: Principal): ResponseEntity<ApiResponse<List<InviteListDTO>>> {
-        log.info("GET /api/v1/invitelist/received/$email")
+    @GetMapping("/received/")
+    fun getInviteByReceivedEmail(principal: Principal): ResponseEntity<ApiResponse<List<InviteListDTO>>> {
+        log.info("GET /api/v1/invitelist/received/")
 
-        val result = cateringListInviteService.findByEmail(email)
+        val u = userService.findByUsername(principal.name)
+
+        val result = cateringListInviteService.findByEmail(u.data?.email ?: "")
 
         return ServiceUtils.handleResult(result)
+    }
+
+    data class InviteRequest(val id: Long)
+
+    @PostMapping("/join/")
+    fun acceptInvite(@RequestBody invite: InviteRequest, principal: Principal): ResponseEntity<ApiResponse<InviteListDTO?>> {
+        log.info("GET /api/v1/invitelist/join/${invite.id}")
+
+        val u = userService.findByUsername(principal.name)
+
+        val inviteResp = cateringListInviteService.findById(invite.id)
+
+        val inv = when(inviteResp) {
+            is OperationResult.Error -> null
+            is OperationResult.Success -> inviteResp.data
+        }
+
+
+        inv?.let {
+            if (inv.userEmail == u.data?.email) {
+                inv.accepted = true
+                val result = cateringListInviteService.update( it.toInviteListUpdateDTO() )
+
+                return ServiceUtils.handleResult(result)
+            }
+        }
+        return ServiceUtils.createResponse(null)
     }
 
     @PostMapping("/")
@@ -75,7 +105,7 @@ class CateringListInviteController(
     }
 
     @PutMapping("/")
-    fun updateCateringList(@RequestBody invite: InviteListCreateDTO, principal: Principal): ResponseEntity<ApiResponse<InviteListDTO?>> {
+    fun updateCateringList(@RequestBody invite: InviteListUpdateDTO, principal: Principal): ResponseEntity<ApiResponse<InviteListDTO?>> {
         log.info("PUT /api/v1/invitelist/")
 
         val usr = userService.findByUsername(principal.name)

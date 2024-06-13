@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service
 @Service
 class CateringItemTypeService(
     private val cateringItemTypeRepository: CateringItemTypeRepository,
-    private val cateringItemRepo: CateringItemRepository,
     private val cateringListRepo: CateringListRepository,
     private val cateringItemService: CateringItemService
 ) : ICateringItemTypeService {
@@ -90,5 +89,10 @@ class CateringItemTypeService(
     override fun findById(id: Long): OperationResult.Success<CateringItemTypeDTO?> {
         val list =  cateringItemTypeRepository.findById(id).get()
         return OperationResult.Success(list.toDTO())
+    }
+
+    override fun findByUserId(userId: Long): OperationResult<List<CateringItemTypeDTO?>> {
+        val list =  cateringItemTypeRepository.findCateringItemTypesByUserId(userId)
+        return OperationResult.Success(list.map { it.toDTO() })
     }
 }

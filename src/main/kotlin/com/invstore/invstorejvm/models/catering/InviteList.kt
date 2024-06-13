@@ -43,9 +43,19 @@ data class InviteListDTO(
     val userEmail: String,
     val whoInvited: UserDTO,
     val relatedList: CateringListDTO,
-    val accepted: Boolean,
+    var accepted: Boolean,
     val dateSent: LocalDateTime
-)
+) {
+    fun toInviteListUpdateDTO(): InviteListUpdateDTO {
+        return InviteListUpdateDTO(
+            id = this.id,
+            userEmail = this.userEmail,
+            whoInvited = this.whoInvited,
+            relatedList = this.relatedList.id,
+            accepted = this.accepted
+        )
+    }
+}
 
 data class InviteListCreateDTO(
     var id: Long?,
@@ -61,6 +71,25 @@ data class InviteListCreateDTO(
             whoInvited = this.whoInvited!!.toUser(),
             relatedList = list.get(),
             accepted = false,
+        )
+    }
+}
+
+data class InviteListUpdateDTO(
+    var id: Long,
+    var userEmail: String?,
+    var whoInvited: UserDTO?,
+    var relatedList: Long?,
+    var accepted: Boolean,
+) {
+    fun toInviteList(cateringListRepository: CateringListRepository): InviteList {
+        val list = cateringListRepository.findById(relatedList ?: 0)
+        return InviteList(
+            id = this.id,
+            userEmail = this.userEmail!!,
+            whoInvited = this.whoInvited!!.toUser(),
+            relatedList = list.get(),
+            accepted = this.accepted,
         )
     }
 }

@@ -49,6 +49,16 @@ class GlobalExceptionHandler {
         return ResponseEntity(errorDetails, HttpStatus.NOT_FOUND)
     }
 
+    @ExceptionHandler(MissingAccessException::class)
+    fun handleMissingAccess(ex: MissingAccessException): ResponseEntity<Any> {
+        val errorDetails = ErrorDetails(
+            status = HttpStatus.NOT_ACCEPTABLE.value(),
+            message = "Invalid Request",
+            details = ex.message
+        )
+        return ResponseEntity(errorDetails, HttpStatus.NOT_FOUND)
+    }
+
     // Handle general exceptions
     @ExceptionHandler(Exception::class)
     fun handleAllUncaughtException(ex: Exception): ResponseEntity<Any> {
@@ -67,3 +77,5 @@ data class ErrorDetails(
     val message: String,
     val details: String?
 )
+
+class MissingAccessException(message: String?) : java.lang.Exception(message)

@@ -5,7 +5,7 @@ import com.invstore.invstorejvm.services.OperationResult
 
 interface ICateringListInviteService {
     fun create(invite: InviteListCreateDTO): OperationResult<InviteListDTO?>
-    fun update(invite: InviteListCreateDTO): OperationResult<InviteListDTO?>
+    fun update(invite: InviteListUpdateDTO): OperationResult<InviteListDTO?>
     fun delete(invite: InviteList)
     fun findById(id: Long): OperationResult<InviteListDTO?>
     fun findByEmail(email: String): OperationResult<List<InviteListDTO>>

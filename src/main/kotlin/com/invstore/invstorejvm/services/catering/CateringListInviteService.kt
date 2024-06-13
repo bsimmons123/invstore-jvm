@@ -47,7 +47,7 @@ class CateringListInviteService : ICateringListInviteService {
         }
     }
 
-    override fun update(invite: InviteListCreateDTO): OperationResult<InviteListDTO?> {
+    override fun update(invite: InviteListUpdateDTO): OperationResult<InviteListDTO?> {
         val errors = hashMapOf<String, String>()
 
         // USER
@@ -64,6 +64,7 @@ class CateringListInviteService : ICateringListInviteService {
         if (invite.relatedList == null) {
             errors["List"] = "Must be a valid list"
         }
+
         val invites = invite.toInviteList(cateringListRepository)
 
         // If any errors, throw exception
