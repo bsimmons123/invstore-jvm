@@ -3,19 +3,24 @@ import useApi from "@/api/axios";
 import CateringListHelpers from "@/store/catering/services/helpers";
 import {StoreState} from "@/store/catering/state";
 import {createCateringListAdapter} from "@/store/catering/services/CreateCateringListAdapter";
+import router from "@/router";
+import RouterList from "@/store/global-helpers/routerList";
 
 export const StoreActions = {
   getLists: 'getLists',
   createList: 'createList',
   getList: 'getList',
   getItems: 'getItems',
+  getItemsUser: 'getItemsUser',
   createItem: 'createItem',
   createType: 'createType',
   getTypes: 'getTypes',
+  getTypesUser: 'getTypesUser',
   updateList: 'updateList',
   createInvite: 'createInvite',
   getInvites: 'getInvites',
-  getInvitesForUser: 'getInvitesForUser'
+  getInvitesForUser: 'getInvitesForUser',
+  joinList: 'joinList',
 };
 
 export default {
@@ -68,16 +73,33 @@ export default {
                 commit(StoreMutations.SET_LOADING_ITEM, false)
             })
             .catch((error) => {
+                if (error.response.status === 404) {
+                    router.push({ name: RouterList.routes.cateringNotFound.name })
+                }
+            });
+    },
+    getItems({ commit, state }) {
+        commit(StoreMutations.SET_LOADING_ITEM, true)
+        const api = useApi();
+        if (state[StoreState.selList].id === undefined) {
+            return
+        }
+        api.get(`${CateringListHelpers.paths.getCateringListById()}${state[StoreState.selList].id}`)
+            .then((res) => {
+                commit(StoreMutations.SET_ITEMS, res.data.value)
+                commit(StoreMutations.SET_LOADING_ITEM, false)
+            })
+            .catch((error) => {
                     console.log(error)
                     commit(StoreMutations.SET_LOADING_ITEM, false)
                 }
             );
     },
-    getItems({ commit, state }) {
+    getItemsUser({ commit }) {
         commit(StoreMutations.SET_LOADING_ITEM, true)
         const api = useApi();
 
-        api.get(`${CateringListHelpers.paths.getCateringListById()}${state[StoreState.selList].id}`)
+        api.get(`${CateringListHelpers.paths.getCateringItemByUser()}`)
             .then((res) => {
                 commit(StoreMutations.SET_ITEMS, res.data.value)
                 commit(StoreMutations.SET_LOADING_ITEM, false)
@@ -136,7 +158,25 @@ export default {
         commit(StoreMutations.SET_LOADING_TYPE, true)
         const api = useApi();
 
+        if (state[StoreState.selList].id === undefined) {
+            return
+        }
         api.get(`${CateringListHelpers.paths.cateringItemType()}${state[StoreState.selList].id}`)
+            .then((res) => {
+                commit(StoreMutations.SET_TYPES, res.data.value)
+                commit(StoreMutations.SET_LOADING_TYPE, false)
+            })
+            .catch((error) => {
+                    console.log(error)
+                    commit(StoreMutations.SET_LOADING_TYPE, false)
+                }
+            );
+    },
+    getTypesUser({ commit }) {
+        commit(StoreMutations.SET_LOADING_TYPE, true)
+        const api = useApi();
+
+        api.get(`${CateringListHelpers.paths.cateringItemTypeUser()}`)
             .then((res) => {
                 commit(StoreMutations.SET_TYPES, res.data.value)
                 commit(StoreMutations.SET_LOADING_TYPE, false)
@@ -194,6 +234,9 @@ export default {
         commit(StoreMutations.SET_LOADING_INVITES, true)
         const api = useApi();
 
+        if (state[StoreState.selList].id === undefined) {
+            return
+        }
         api.get(`${CateringListHelpers.paths.cateringInviteListId()}${state[StoreState.selList].id}`)
             .then((res) => {
                 commit(StoreMutations.SET_INVITES, res.data.value)
@@ -205,11 +248,11 @@ export default {
                 }
             );
     },
-    getInvitesForUser({ commit }, userEmail) {
+    getInvitesForUser({ commit }) {
         commit(StoreMutations.SET_USER_LOADING_INVITES, true)
         const api = useApi();
 
-        api.get(`${CateringListHelpers.paths.cateringInviteListRec()}${userEmail}`)
+        api.get(`${CateringListHelpers.paths.cateringInviteListRec()}`)
             .then((res) => {
                 commit(StoreMutations.SET_USER_INVITES, res.data.value)
                 commit(StoreMutations.SET_USER_LOADING_INVITES, false)
@@ -217,6 +260,20 @@ export default {
             .catch((error) => {
                     console.log(error)
                     commit(StoreMutations.SET_USER_LOADING_INVITES, false)
+                }
+            );
+    },
+    joinList({ commit }, id) {
+        const api = useApi();
+        console.log(id)
+
+        api.post(`${CateringListHelpers.paths.cateringInviteListJoin()}`, {id: id})
+            .then((res) => {
+                commit(StoreMutations.SET_USER_LOADING_INVITES, false)
+                alert(res)
+            })
+            .catch((error) => {
+                    console.log(error)
                 }
             );
     }

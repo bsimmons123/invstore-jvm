@@ -10,6 +10,7 @@ import {StoreState} from "@/store/catering/state";
 import {StoreState as ProfileStoreState} from "@/store/profile/state";
 import CreateCateringList from "@/views/components/CreateCateringList.vue";
 import {StoreMutations} from "@/store/catering/mutations";
+import {StoreGetters} from "@/store/catering/getters";
 
 
 const store = useStore();
@@ -17,13 +18,14 @@ const store = useStore();
 const cateringListState = store.state.cateringList;
 const profileState = store.state.profile;
 
-const list = computed(() => cateringListState[StoreState.list]);
 const createListAdapter = computed(() => cateringListState[StoreState.createListAdapter]);
 const createListLoading = computed(() => cateringListState[StoreState.createListLoading]);
 const createErrors = computed(() => cateringListState[StoreState.createErrors]);
 const loadingLists = computed(() => cateringListState[StoreState.loadingLists]);
 const showCreateList = computed(() => cateringListState[StoreState.createListOption]);
 const user = computed(() => profileState[ProfileStoreState.user]);
+const userLists = computed(() => store.getters[`${StoreIndex.storeName}/${StoreGetters.usersLists}`](user.value.id));
+const invitedLists = computed(() => store.getters[`${StoreIndex.storeName}/${StoreGetters.invitedLists}`](user.value.id));
 
 const getLists = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getLists}`);
 const getUserInfo = () => store.dispatch(`${ProfileStoreIndex.storeName}/${ProfileStoreActions.getUser}`);
@@ -44,7 +46,8 @@ onMounted(() => {
     <div class="row">
       <div :class="showCreateList ? 'col-lg-8' : 'col-lg-12'">
         <catering-list-table
-            :list="list"
+            :list="userLists"
+            :inv-list="invitedLists"
             :title="`${user.username}'s Catering Lists`"
             :loading="loadingLists"
             :is-expanded="!showCreateList"

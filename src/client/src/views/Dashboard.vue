@@ -8,6 +8,29 @@ import US from "@/assets/img/icons/flags/US.png";
 import DE from "@/assets/img/icons/flags/DE.png";
 import GB from "@/assets/img/icons/flags/GB.png";
 import BR from "@/assets/img/icons/flags/BR.png";
+import {useStore} from "vuex";
+import {computed, onMounted} from "vue";
+import {StoreState} from "@/store/catering/state";
+import StoreIndex from "@/store/catering/_StoreIndex";
+import {StoreActions} from "@/store/catering/actions";
+
+const store = useStore();
+
+const cateringListState = store.state.cateringList;
+
+const lists = computed(() => cateringListState[StoreState.list]);
+// const listsLoading = computed(() => cateringListState[StoreState.loadingLists]);
+const items = computed(() => cateringListState[StoreState.items]);
+// const itemsLoading = computed(() => cateringListState[StoreState.loadingItems]);
+const types = computed(() => cateringListState[StoreState.types]);
+// const typesLoading = computed(() => cateringListState[StoreState.loadingTypes]);
+const invites = computed(() => cateringListState[StoreState.userInvites])
+// const invitesLoading = computed(() => cateringListState[StoreState.userInvitesLoading])
+
+const getLists = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getLists}`);
+const getItems = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getItemsUser}`);
+const getTypes = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getTypesUser}`);
+const getInvites = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.getInvitesForUser}`)
 
 const sales = {
   us: {
@@ -39,6 +62,13 @@ const sales = {
     flag: BR,
   },
 };
+
+onMounted(() => {
+  getLists()
+  getItems()
+  getTypes()
+  getInvites()
+});
 </script>
 <template>
   <div class="py-4 container-fluid">
@@ -47,11 +77,11 @@ const sales = {
         <div class="row">
           <div class="col-lg-3 col-md-6 col-12">
             <mini-statistics-card
-              title="Today's Money"
-              value="$53,000"
+              title="Total Lists"
+              :value="lists.length"
               description="<span
                 class='text-sm font-weight-bolder text-success'
-                >+55%</span> since yesterday"
+                >+0%</span> since yesterday"
               :icon="{
                 component: 'ni ni-money-coins',
                 background: 'bg-gradient-primary',
@@ -61,11 +91,11 @@ const sales = {
           </div>
           <div class="col-lg-3 col-md-6 col-12">
             <mini-statistics-card
-              title="Today's Users"
-              value="2,300"
+              title="Total Items"
+              :value="items.length"
               description="<span
                 class='text-sm font-weight-bolder text-success'
-                >+3%</span> since last week"
+                >+0%</span> since last week"
               :icon="{
                 component: 'ni ni-world',
                 background: 'bg-gradient-danger',
@@ -75,11 +105,11 @@ const sales = {
           </div>
           <div class="col-lg-3 col-md-6 col-12">
             <mini-statistics-card
-              title="New Clients"
-              value="+3,462"
+              title="Total Types"
+              :value="types.length"
               description="<span
-                class='text-sm font-weight-bolder text-danger'
-                >-2%</span> since last quarter"
+                class='text-sm font-weight-bolder text-success'
+                >0%</span> since last quarter"
               :icon="{
                 component: 'ni ni-paper-diploma',
                 background: 'bg-gradient-success',
@@ -188,34 +218,14 @@ const sales = {
           </div>
           <div class="col-lg-5">
             <categories-list
-              :categories="[
-                {
-                  icon: {
-                    component: 'ni ni-mobile-button',
-                    background: 'dark',
-                  },
-                  label: 'Devices',
-                  description: '250 in stock <strong>346+ sold</strong>',
-                },
-                {
-                  icon: {
-                    component: 'ni ni-tag',
-                    background: 'dark',
-                  },
-                  label: 'Tickets',
-                  description: '123 closed <strong>15 open</strong>',
-                },
-                {
-                  icon: { component: 'ni ni-box-2', background: 'dark' },
-                  label: 'Error logs',
-                  description: '1 is active <strong>40 closed</strong>',
-                },
-                {
-                  icon: { component: 'ni ni-satisfied', background: 'dark' },
-                  label: 'Happy Users',
-                  description: '+ 430',
-                },
-              ]"
+              title="Invite List"
+              :categories="invites.map(invite => {
+                  return {
+                    icon: invite,
+                    label: invite.relatedList.label, // display email as a label
+                    description: `Invited by ${invite.whoInvited.name}, ${invite.accepted ? '<strong>Accepted</strong>' : '<strong>Pending</strong>'}`,
+                  };
+                })"
             />
           </div>
         </div>

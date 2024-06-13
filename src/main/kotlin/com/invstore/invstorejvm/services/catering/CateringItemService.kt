@@ -93,4 +93,13 @@ class CateringItemService(
         val list =  cateringItemRepository.findById(id).get()
         return OperationResult.Success(list.toCateringItemDTO())
     }
+
+    override fun findByUserId(userId: Long): OperationResult<List<CateringItemDTO?>> {
+        val list =  cateringItemRepository.findCateringItemsByUserId(userId)
+        if (list != null) {
+            return OperationResult.Success(list.map { it.toCateringItemDTO() })
+        } else {
+            return OperationResult.Error()
+        }
+    }
 }

@@ -16,16 +16,14 @@ const store = useStore();
 const route = useRoute();
 
 const loginState = store.state.userLogin;
-const profile = store.state.profile;
 const cateringList = store.state.cateringList;
 
 const loggedIn = computed(() => loginState.isLoggedIn);
-const user = computed(() => profile.user)
 const invites = computed(() => cateringList.userInvites)
 
 const logout = () => store.dispatch(`${StoreIndex.storeName}/${StoreActions.logout}`);
 const getUserProfile = () => store.dispatch(`${ProfileStoreIndex.storeName}/${ProfileStoreActions.getUser}`);
-const getInvitesForUser = (userEmail) => store.dispatch(`${CateringStoreIndex.storeName}/${CateringStoreActions.getInvitesForUser}`, userEmail)
+const getInvitesForUser = () => store.dispatch(`${CateringStoreIndex.storeName}/${CateringStoreActions.getInvitesForUser}`)
 
 const currentRouteName = computed(() => {
   return route.name;
@@ -46,8 +44,7 @@ const closeMenu = () => {
 
 onMounted(() => {
   getUserProfile().then(() => {
-    console.log(user.value)
-    getInvitesForUser(user.value.email)
+    getInvitesForUser()
   })
 });
 </script>

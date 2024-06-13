@@ -45,5 +45,10 @@ export default class RouterList {
             name: 'Signup',
             component: 'Signup',
         },
+        cateringNotFound: {
+            path: '/cateringlist-not-found',
+            name: 'CateringListNotFound',
+            component: 'CateringListNotFound'
+        }
     };
 }
