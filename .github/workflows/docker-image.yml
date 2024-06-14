@@ -24,7 +24,7 @@ jobs:
     needs: [test]
     env:
       REPO: ${{ secrets.DOCKER_REPO }}
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v1
       - name: Login to Docker Hub
