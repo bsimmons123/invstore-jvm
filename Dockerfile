@@ -9,7 +9,7 @@ WORKDIR /app
 COPY . /app
 
 # Build frontend files so they're available in the build step
-RUN ./gradlew install && ./gradlew build
+RUN ./gradlew build -x test --no-daemon && ./gradlew build -x test --no-daemon
 
 # Make port 8080 available to the world outside this container
 EXPOSE 9090

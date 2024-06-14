@@ -81,3 +81,8 @@ task("buildFrontend", type = NpmTask::class) {
 tasks.getByName("bootRun") {
     dependsOn("buildFrontend")
 }
+
+
+tasks.getByName("build") {
+    dependsOn("buildFrontend")
+}
