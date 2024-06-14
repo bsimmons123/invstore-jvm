@@ -16,7 +16,7 @@ jobs:
         with:
           java-version: 17.0.9
       - name: Gradle Tests
-        run: ./gradlew test
+        run: ./gradlew clean test
 
   docker:
     name: Publish - Docker Hub
