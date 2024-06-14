@@ -58,8 +58,8 @@ onMounted(() => {
                   }"
                 :title="list.label"
                 :description="list.description"
-                value="+$2000"
             />
+            <!--      Could maybe add event/list date as value item      -->
           </div>
           <div class="col-xl-6">
             <div class="row">
