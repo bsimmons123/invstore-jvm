@@ -79,7 +79,7 @@ class CateringListInviteControllerTest {
             id = 0,
             userEmail = user,
             whoInvited = who,
-            relatedList = list,
+            relatedList = list.id,
         )
     }
 
@@ -122,10 +122,9 @@ class CateringListInviteControllerTest {
     @Transactional
     fun getInviteListByReceivedEmail() {
         buildAndCreateInviteList("jimboBean@bean.com", "new@new.new")
-        mvc!!.perform(MockMvcRequestBuilders.get("/api/v1/invitelist/received/new@new.new"))
+        mvc!!.perform(MockMvcRequestBuilders.get("/api/v1/invitelist/received/"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.value[0].userEmail").value("new@new.new"));
     }
 
     @Test

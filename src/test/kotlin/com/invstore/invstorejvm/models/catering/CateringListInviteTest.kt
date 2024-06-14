@@ -69,7 +69,7 @@ class CateringListInviteTest {
             id = 0,
             userEmail = user,
             whoInvited = who,
-            relatedList = list,
+            relatedList = list.id,
         )
     }
 
@@ -100,15 +100,16 @@ class CateringListInviteTest {
         }
 
         val inv = buildCateringListInvite(user= user2.email, who = user.toUserDTO(), list = list!!)
-        when (val createdInvite = cateringListInviteService.create(inv)) {
+        val id = when (val createdInvite = cateringListInviteService.create(inv)) {
             is OperationResult.Success -> {
                 assert(createdInvite.data!!.id > 0)
+                createdInvite.data!!.id
             }
 
             is OperationResult.Error -> fail()
         }
 
-        when (val l = cateringListInviteService.findById(1)) {
+        when (val l = cateringListInviteService.findById(id)) {
             is OperationResult.Success -> {
                 assert(l.data != null)
             }
