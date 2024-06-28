@@ -9,6 +9,7 @@ import Signin from "../views/Signin.vue";
 import RouterList from "@/store/global-helpers/routerList";
 import CateringList from "@/views/CateringList.vue";
 import CateringListNotFound from "@/views/components/CateringListNotFound.vue";
+import LandingPage from "@/views/LandingPage.vue";
 
 const routes = [
   {
@@ -63,6 +64,15 @@ const routes = [
     component: Billing,
     meta: {
       requiresAuth: true
+    }
+  },
+  {
+    path: "/landing",
+    name: "Landing",
+    value: "Landing",
+    component: LandingPage,
+    meta: {
+      requiresAuth: false
     }
   },
   {
