@@ -16,7 +16,7 @@ class ImageController {
 
     @GetMapping("/user/{id}")
     fun getImage(@PathVariable id: Long): ResponseEntity<Resource?> {
-        val imagePath = "/images/${Path.USER.value}/$id-userAvatar.png" // Get path from DB based on id
+        val imagePath = "images/${Path.USER.value}/$id-userAvatar.png" // Get path from DB based on id
 
         val file = UrlResource("file:$imagePath")
         return if (file.exists() || file.isReadable) {

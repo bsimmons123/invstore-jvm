@@ -27,18 +27,32 @@
       ></v-tab>
     </v-tabs>
 
-    <v-avatar
-      class="hidden-sm-and-down"
-      color="grey-darken-1"
-      size="32"
-    ></v-avatar>
-    <!--  This should be a Sign In button if not logged in  -->
+    <template v-if="loading">
+      <v-btn
+        :loading="loading"
+      ></v-btn>
+    </template>
+    <template v-else>
+      <user-avatar
+        v-if="user"
+        :user="user"
+        @logout:disconnect="store.logout()"
+      />
+
+      <v-btn rounded="xl" color="blue" variant="elevated" to="/signin" v-else>Signin</v-btn>
+    </template>
   </v-app-bar>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { defineProps, defineEmits } from 'vue'
+import {computed, ref} from 'vue'
+import {useAppStore} from "@/stores/app";
+import UserAvatar from "@/components/UserAvatar.vue";
+
+let store = useAppStore()
+
+const loading = computed(() => store.isLoading);
+const user = computed(() => store.user);
 
 const props = defineProps({
   theme: {

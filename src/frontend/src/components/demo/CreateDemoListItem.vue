@@ -7,7 +7,7 @@
         <v-btn
           class="text-none font-weight-regular"
           prepend-icon="mdi-account"
-          text="Add Event"
+          text="Add Item"
           variant="tonal"
           v-bind="activatorProps"
         ></v-btn>
@@ -15,7 +15,7 @@
 
       <v-card
         prepend-icon="mdi-account"
-        title="Add Event Item"
+        title="Add Item"
       >
         <v-card-text>
           <v-row dense>

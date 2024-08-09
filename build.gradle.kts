@@ -64,7 +64,7 @@ node {
     npmInstallCommand = "install"
     workDir = file("./.gradle/nodejs")
     npmWorkDir = file("./.gradle/npm")
-    nodeProjectDir = file("./src/client")
+    nodeProjectDir = file("./src/frontend")
 }
 
 task("install") {
@@ -75,7 +75,7 @@ task("buildFrontend", type = NpmTask::class) {
     group = "npm"
     dependsOn("npmInstall")
     args = listOf("run", "build")
-    workingDir = file("./src/client")
+    workingDir = file("./src/frontend")
 }
 
 tasks.getByName("bootRun") {

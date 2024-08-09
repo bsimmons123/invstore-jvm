@@ -46,6 +46,10 @@ export default defineConfig({
       vueTemplate: true,
     }),
   ],
+  build: {
+    outDir: '../../build/resources/main/static',
+    emptyOutDir: true
+  },
   define: { 'process.env': {} },
   resolve: {
     alias: {
@@ -63,5 +67,19 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:9090/',
+        changeOrigin: true,
+        ws: false,
+        webSocketTimeout: 60000,
+      },
+      '/oauth2': {
+        target: 'http://127.0.0.1:9090/',
+        changeOrigin: true,
+        ws: false,
+        webSocketTimeout: 60000,
+      },
+    },
   },
 })
